@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/JohnDoneth/367-Project#readme",
   "dependencies": {
+    "stats.js": "^0.17.0",
     "three": "^0.102.1"
   }
 }
