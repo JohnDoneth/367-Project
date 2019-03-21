@@ -10,7 +10,7 @@ document
 var scene = new THREE.Scene();
 var camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
 
-var renderer = new THREE.WebGLRenderer({ antialias: true });
+var renderer = new THREE.WebGLRenderer({antialias: true});
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default
@@ -19,10 +19,10 @@ document
     .body
     .appendChild(renderer.domElement);
 
-var ambientLight = new THREE.AmbientLight( 0x707070 ); // soft white light
-scene.add( ambientLight );
+var ambientLight = new THREE.AmbientLight(0x707070); // soft white light
+scene.add(ambientLight);
 
-let light = new THREE.SpotLight( 0xffffff );
+let light = new THREE.SpotLight(0xffffff);
 //let light = new THREE.HemisphereLight(0xffffbb, 0x080820, 1);
 light.castShadow = true;
 light.position.y = 5.0;
@@ -30,10 +30,10 @@ scene.add(light);
 
 //Set up shadow properties for the light
 
-light.shadow.mapSize.width = 2048;  // default
+light.shadow.mapSize.width = 2048; // default
 light.shadow.mapSize.height = 2048; // default
-light.shadow.camera.near = 0.5;       // default
-light.shadow.camera.far = 1000      // default
+light.shadow.camera.near = 0.5; // default
+light.shadow.camera.far = 1000 // default
 light.shadow.radius = 1.5;
 light.shadow.bias = 0.0001;
 
@@ -67,15 +67,22 @@ function onWindowResize() {
 
 }
 
-function animate() {
-    stats.begin();
+let deltaClock = new THREE.Clock(true);
 
-    cube.rotation.x += 0.01;
-    cube.rotation.y += 0.01;
+// Main game loop
+function gameloop() {
 
-    requestAnimationFrame(animate);
-    renderer.render(scene, camera);
+    // Delta time between frames, used for smooth movement
+    let deltaTime = deltaClock.getDelta();
 
-    stats.end();
+    cube.rotation.x += 0.7 * deltaTime;
+    cube.rotation.y += 0.7 * deltaTime;
+
+    renderer.render(scene, camera); // render the entire scene
+
+    stats.update(); // update FPS stats counter
+
+    requestAnimationFrame(gameloop); // ask the browser to call our function again when it can
 }
-animate();
+
+gameloop(); // start the game loop
