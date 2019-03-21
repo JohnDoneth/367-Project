@@ -2,6 +2,14 @@
 # yarn lockfile v1
 
 
+key-state@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/key-state/-/key-state-1.0.1.tgz#3e8e9bff5c3fc6b362f8b7f2c2282ff96f18596c"
+
+oimo@^1.0.9:
+  version "1.0.9"
+  resolved "https://registry.yarnpkg.com/oimo/-/oimo-1.0.9.tgz#0b592e361c799103fdb04fb3be1264245ef6884b"
+
 stats.js@^0.17.0:
   version "0.17.0"
   resolved "https://registry.yarnpkg.com/stats.js/-/stats.js-0.17.0.tgz#b1c3dc46d94498b578b7fd3985b81ace7131cc7d"

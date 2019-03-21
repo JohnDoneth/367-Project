@@ -18,6 +18,8 @@
   },
   "homepage": "https://github.com/JohnDoneth/367-Project#readme",
   "dependencies": {
+    "key-state": "^1.0.1",
+    "oimo": "^1.0.9",
     "stats.js": "^0.17.0",
     "three": "^0.102.1"
   }
