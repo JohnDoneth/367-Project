@@ -35,7 +35,6 @@ let light = new THREE.SpotLight(0xffffff);
 //let light = new THREE.HemisphereLight(0xffffbb, 0x080820, 1);
 light.castShadow = true;
 light.position.y = 5.0;
-scene.add(light);
 
 // Set up shadow properties for the light
 light.shadow.mapSize.width = 2048; // default
@@ -44,6 +43,8 @@ light.shadow.camera.near = 0.5; // default
 light.shadow.camera.far = 1000; // default
 light.shadow.radius = 1.5;
 light.shadow.bias = 0.0001;
+
+scene.add(light);
 
 let material = new THREE.MeshPhongMaterial({color: 0xf0f0f0, specular: 0xffffff, reflectivity: 0.8, shininess: 1.0});
 let geometry = new THREE.SphereBufferGeometry(1.0, 32, 16);
@@ -146,8 +147,29 @@ function gameloop() {
       copyPhysicsProperties(planeBody[0], planeBody[1]);
     }
 
-    if (keys.Space) {
-        // planeBody.setRotation({x: 0, y: 20, z: 0})
+    if (keys["ArrowUp"]) {
+      sphereBody.awake();
+      sphereBody.position.z -= 0.1;
+    }
+
+    if (keys["ArrowDown"]) {
+      sphereBody.awake();
+      sphereBody.position.z += 0.1;
+    }
+
+    if (keys["ArrowLeft"]) {
+      sphereBody.awake();
+      sphereBody.position.x -= 0.1;
+    }
+
+    if (keys["ArrowRight"]) {
+      sphereBody.awake();
+      sphereBody.position.x += 0.1;
+    }
+
+    if (sphereBody.position.y <= -25.0) {
+      sphereBody.sleep();
+      sphereBody.position = new OIMO.Vec3(0, 0, 0);
     }
 
     // Update physics
