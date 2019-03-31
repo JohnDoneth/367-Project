@@ -160,22 +160,23 @@ function gameloop() {
 
     if (keys["ArrowUp"]) {
       sphereBody.awake();
-      sphereBody.position.z -= 0.1;
+      // sphereBody.position.z -= 0.1;
+      sphereBody.applyImpulse(new OIMO.Vec3(0, 0, 0), new OIMO.Vec3(0, 0, -0.1));
     }
 
     if (keys["ArrowDown"]) {
       sphereBody.awake();
-      sphereBody.position.z += 0.1;
+      sphereBody.applyImpulse(new OIMO.Vec3(0, 0, 0), new OIMO.Vec3(0, 0, 0.1));
     }
 
     if (keys["ArrowLeft"]) {
       sphereBody.awake();
-      sphereBody.position.x -= 0.1;
+      sphereBody.applyImpulse(new OIMO.Vec3(0, 0, 0), new OIMO.Vec3(-0.1, 0, 0));
     }
 
     if (keys["ArrowRight"]) {
       sphereBody.awake();
-      sphereBody.position.x += 0.1;
+      sphereBody.applyImpulse(new OIMO.Vec3(0, 0, 0), new OIMO.Vec3(0.1, 0, 0));
     }
 
     if (sphereBody.position.y <= -25.0) {
