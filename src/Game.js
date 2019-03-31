@@ -4,6 +4,11 @@ const OIMO = require("oimo");
 const MazeCreator = require("./MazeCreator");
 import listen from "key-state";
 
+const audio = new Audio("ripped.mp3");
+audio.volume = 0.1;
+audio.loop = true;
+// audio.play();
+
 const keys = listen(window);
 
 const coords = MazeCreator.create(MazeCreator.ONE);
@@ -52,6 +57,7 @@ let geometry = new THREE.SphereBufferGeometry(1.0, 32, 16);
 let sphere = new THREE.Mesh(geometry, material);
 sphere.castShadow = true;
 sphere.receiveShadow = true;
+
 scene.add(sphere);
 
 // Physics world
@@ -133,6 +139,11 @@ function copyPhysicsProperties(target, body) {
         .copy(body.getQuaternion());
 }
 
+function updateCameraPosition() {
+  camera.position.x = sphereBody.position.x;
+  camera.position.z = sphereBody.position.z + 8;
+}
+
 let deltaClock = new THREE.Clock(true);
 
 // Main game loop
@@ -171,6 +182,8 @@ function gameloop() {
       sphereBody.sleep();
       sphereBody.position = new OIMO.Vec3(0, 0, 0);
     }
+
+    updateCameraPosition();
 
     // Update physics
     world.step();
