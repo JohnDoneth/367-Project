@@ -4,6 +4,8 @@ const OIMO = require("oimo");
 const MazeCreator = require("./MazeCreator");
 import listen from "key-state";
 
+const death = new Audio("die.mp3");
+death.volume = 0.1;
 const audio = new Audio("ripped.mp3");
 audio.volume = 0.1;
 audio.loop = true;
@@ -182,6 +184,7 @@ function gameloop() {
     if (sphereBody.position.y <= -25.0) {
       sphereBody.sleep();
       sphereBody.position = new OIMO.Vec3(0, 0, 0);
+      death.play();
     }
 
     updateCameraPosition();
