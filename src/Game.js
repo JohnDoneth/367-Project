@@ -5,9 +5,9 @@ const MazeCreator = require("./MazeCreator");
 import listen from "key-state";
 
 const death = new Audio("die.mp3");
-death.volume = 0.1;
+death.volume = 0.25;
 const audio = new Audio("ripped.mp3");
-audio.volume = 0.1;
+audio.volume = 0.2;
 audio.loop = true;
 // audio.play();
 
@@ -41,7 +41,8 @@ scene.add(ambientLight);
 let light = new THREE.SpotLight(0xffffff);
 //let light = new THREE.HemisphereLight(0xffffbb, 0x080820, 1);
 light.castShadow = true;
-light.position.y = 5.0;
+light.intensity = 2.0;
+light.distance = 200;
 
 // Set up shadow properties for the light
 light.shadow.mapSize.width = 2048; // default
@@ -59,8 +60,11 @@ let geometry = new THREE.SphereBufferGeometry(1.0, 32, 16);
 let sphere = new THREE.Mesh(geometry, material);
 sphere.castShadow = true;
 sphere.receiveShadow = true;
+sphere.name = "sphere";
 
 scene.add(sphere);
+
+light.target = scene.getObjectByName('sphere');
 
 // Physics world
 let world = new OIMO.World({
