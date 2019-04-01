@@ -18,11 +18,21 @@ export default class Maze {
   }
 
   private createCells() {
+    let count = 0;
     for (let i = 0; i < this._height; i++) {
       for (let j = 0; j < this._width; j++) {
-        this._cells.push(new Cell(j, i, this._cellWidth, this._cellHeight));
+        this._cells.push(new Cell(count, j, i, this._cellWidth, this._cellHeight));
+        if (count === 0) {
+          this._cells[count].hasTopWall = true;
+          this._cells[count].hasRightWall = true;
+        }
+        count++;
       }
     }
+  }
+
+  private randomize() {
+
   }
 
   get width(): number {
@@ -46,4 +56,4 @@ export default class Maze {
   }
 }
 
-export const MAZE_ONE = new Maze(11, 11, 5, 5);
+export const MAZE_ONE = new Maze(2, 1, 5, 5);
