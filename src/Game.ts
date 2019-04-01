@@ -129,21 +129,19 @@ export default class Game {
     this._bodies = [];
     const results: IMazeResults = MazeCreator.create(MAZE_ONE);
     const material = new MeshPhongMaterial({color: 0x1F85DE, specular: 0xffffff, reflectivity: 0.8, shininess: 1.0});
-    for (let object of results.objectCoords) {
-      let planeGeometry = new BoxGeometry(5, 0.25, 5);
-      let planeMesh = new Mesh(planeGeometry, material);
-      planeMesh.receiveShadow = true;
-      this._scene.add(planeMesh);
-
+    for (let object of results.objects) {
       const length = MAZE_ONE.cellHeight;
       const width = MAZE_ONE.cellWidth;
+      let planeGeometry = new BoxGeometry(width, 0.25, length);
+      let planeMesh = new Mesh(planeGeometry, material);
+      planeMesh.receiveShadow = true;
       this._bodies.push([planeMesh, this._world.add({
         type: 'box', // type of shape : sphere, box, cylinder
         size: [
           width, 0.25, length
         ], // size of shape
         pos: [
-          width * object.x, -3 * object.y, -object.z * length
+          width * object.position.x, -3 * object.position.y, -object.position.z * length
         ], // start position in degree
         rot: [
           0, 0, 0
@@ -155,35 +153,60 @@ export default class Game {
         belongsTo: 1, // The bits of the collision groups to which the shape belongs.
         collidesWith: 0xffffffff, // The bits of the collision groups with which the shape collides.
       })]);
-    }
-    for (let wall of results.wallCoords) {
-      const length = MAZE_ONE.cellHeight;
-      const width = MAZE_ONE.cellWidth;
-      let planeGeometry = new BoxGeometry(wall[0].x, wall[0].y * length, wall[0].z);
-      let planeMesh = new Mesh(planeGeometry, material);
-      planeMesh.receiveShadow = true;
+
+      for (let wall of object.walls) {
+        let wallGeometry = new BoxGeometry(wall[0].x, wall[0].y * length, wall[0].z);
+        let wallMesh = new Mesh(wallGeometry, material);
+        wallMesh.translateY(width * wall[1].x * 5);
+        this._scene.add(wallMesh);
+        console.log(wall[1].x * width, wall[1].y, wall[1].z);
+        this._bodies.push([wallMesh, this._world.add({
+          type: 'box', // type of shape : sphere, box, cylinder
+          size: [
+            wall[0].x, wall[0].y * length, wall[0].z
+          ], // size of shape
+          posShape: [
+            wall[1].x, wall[1].y * -0.5, wall[1].z
+          ],
+          move: false, // dynamic or statique
+          density: 1,
+          friction: 0.2,
+          restitution: 0.2,
+          belongsTo: 1, // The bits of the collision groups to which the shape belongs.
+          collidesWith: 0xffffffff, // The bits of the collision groups with which the shape collides.
+        })]);
+      }
+
       this._scene.add(planeMesh);
-      console.log(wall);
-      console.log(wall[1].x, 0, wall[1].z);
-      this._bodies.push([planeMesh, this._world.add({
-        type: 'box', // type of shape : sphere, box, cylinder
-        size: [
-          wall[0].x, wall[0].y * length, wall[0].z
-        ], // size of shape
-        pos: [
-          0.0175 + wall[1].x, -0.5, wall[1].z - 2.5
-        ], // start position in degree
-        rot: [
-          0, 0, 0
-        ], // start rotation in degree
-        move: false, // dynamic or statique
-        density: 1,
-        friction: 0.2,
-        restitution: 0.2,
-        belongsTo: 1, // The bits of the collision groups to which the shape belongs.
-        collidesWith: 0xffffffff, // The bits of the collision groups with which the shape collides.
-      })]);
     }
+    // for (let wall of results.wallCoords) {
+    //   const length = MAZE_ONE.cellHeight;
+    //   const width = MAZE_ONE.cellWidth;
+    //   let planeGeometry = new BoxGeometry(wall[0].x, wall[0].y * length, wall[0].z);
+    //   let planeMesh = new Mesh(planeGeometry, material);
+    //   planeMesh.receiveShadow = true;
+    //   this._scene.add(planeMesh);
+    //   console.log(wall);
+    //   console.log(wall[1].x, 0, wall[1].z);
+    //   this._bodies.push([planeMesh, this._world.add({
+    //     type: 'box', // type of shape : sphere, box, cylinder
+    //     size: [
+    //       wall[0].x, wall[0].y * length, wall[0].z
+    //     ], // size of shape
+    //     pos: [
+    //       0.0175 + wall[1].x, -0.5, wall[1].z - 2.5
+    //     ], // start position in degree
+    //     rot: [
+    //       0, 0, 0
+    //     ], // start rotation in degree
+    //     move: false, // dynamic or statique
+    //     density: 1,
+    //     friction: 0.2,
+    //     restitution: 0.2,
+    //     belongsTo: 1, // The bits of the collision groups to which the shape belongs.
+    //     collidesWith: 0xffffffff, // The bits of the collision groups with which the shape collides.
+    //   })]);
+    // }
   }
 
   private createPlayer() {

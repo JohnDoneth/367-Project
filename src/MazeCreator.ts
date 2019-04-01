@@ -4,8 +4,12 @@ import Cell from "./models/Cell";
 const OIMO = require("oimo");
 
 export interface IMazeResults {
-  objectCoords: any[]; // Comes back as an array of positions
-  wallCoords: any[]; // Comes back as a array of [size, position]
+  objects: IMazeObject[]; // Comes back as an array of positions
+}
+
+interface IMazeObject {
+  walls: any[];
+  position: any;
 }
 
 class MazeCreator {
@@ -26,29 +30,41 @@ class MazeCreator {
    * | is used to denote row splits.
    */
   public create(maze: Maze): IMazeResults {
-    const objects: any[] = [];
-    const walls: any[] = [];
+    const objects: IMazeObject[] = [];
     let count = 0;
     for (let i = 0; i < maze.height; i++) {
       for (let j = 0; j < maze.width; j++) {
         const cell: Cell = maze.cells[count];
+        const walls: any[] = [];
         if (cell.hasTopWall) {
           walls.push([
             new OIMO.Vec3(maze.cellWidth, 1, 0.1), // size
-            new OIMO.Vec3(Math.ceil(maze.width / 2) - (j + 1), 1, i) // position
+            new OIMO.Vec3((Math.ceil(maze.width / 2) - (j + 1)) * maze.cellWidth, 1, i - (maze.cellHeight / 2)) // position
           ]);
         }
         if (cell.hasRightWall) {
           walls.push([
             new OIMO.Vec3(0.1, 1, maze.cellHeight), // size
-            new OIMO.Vec3(maze.width + 1, 1, i) // position
+            new OIMO.Vec3((Math.ceil((maze.width / 2) - (j + 1)) * maze.cellWidth) + (maze.cellWidth / 2), 1, i) // position
           ]);
         }
-        objects.push(new OIMO.Vec3(Math.ceil(maze.width / 2) - (j + 1), 1, i));
+        if (cell.hasBotWall) {
+          walls.push([
+            new OIMO.Vec3(maze.cellWidth, 1, 0.1), // size
+            new OIMO.Vec3((Math.ceil(maze.width / 2) - (j + 1)) * maze.cellWidth, 1, i + (maze.cellHeight / 2)) // position
+          ]);
+        }
+        if (cell.hasLeftWall) {
+          walls.push([
+            new OIMO.Vec3(0.1, 1, maze.cellHeight), // size
+            new OIMO.Vec3((Math.ceil((maze.width / 2) - (j + 1)) * maze.cellWidth) - (maze.cellWidth / 2), 1, i) // position
+          ]);
+        }
+        objects.push({position: new OIMO.Vec3(Math.ceil(maze.width / 2) - (j + 1), 1, i), walls});
         count++
       }
     }
-    return {objectCoords: objects, wallCoords: walls};
+    return {objects};
   }
 }
 
