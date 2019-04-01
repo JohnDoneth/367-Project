@@ -5,6 +5,8 @@ export default class Cell {
   private readonly _width: number;
   private readonly _height: number;
 
+  private _visited: boolean;
+
   private _hasTopWall: boolean;
   private _hasBotWall: boolean;
   private _hasLeftWall: boolean;
@@ -16,6 +18,8 @@ export default class Cell {
     this._row = row;
     this._width = width;
     this._height = height;
+
+    this._visited = false;
 
     this._hasTopWall = false;
     this._hasBotWall = false;
@@ -41,6 +45,14 @@ export default class Cell {
 
   get height(): number {
     return this._height;
+  }
+
+  get visited(): boolean {
+    return this._visited;
+  }
+
+  set visited(value: boolean) {
+    this._visited = value;
   }
 
   get hasTopWall(): boolean {

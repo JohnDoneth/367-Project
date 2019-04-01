@@ -39,25 +39,25 @@ class MazeCreator {
         if (cell.hasTopWall) {
           walls.push([
             new OIMO.Vec3(maze.cellWidth, 1, 0.1), // size
-            new OIMO.Vec3((Math.ceil(maze.width / 2) - (j + 1)) * maze.cellWidth, 1, i - (maze.cellHeight / 2)) // position
+            new OIMO.Vec3((Math.ceil(maze.width / 2) - (j + 1)) * maze.cellWidth, 1, -(i * maze.cellHeight) - (maze.cellHeight / 2)) // position
           ]);
         }
         if (cell.hasRightWall) {
           walls.push([
             new OIMO.Vec3(0.1, 1, maze.cellHeight), // size
-            new OIMO.Vec3((Math.ceil((maze.width / 2) - (j + 1)) * maze.cellWidth) + (maze.cellWidth / 2), 1, i) // position
+            new OIMO.Vec3((Math.ceil((maze.width / 2) - (j + 1)) * maze.cellWidth) + (maze.cellWidth / 2), 1, -(i * maze.cellHeight)) // position
           ]);
         }
         if (cell.hasBotWall) {
           walls.push([
             new OIMO.Vec3(maze.cellWidth, 1, 0.1), // size
-            new OIMO.Vec3((Math.ceil(maze.width / 2) - (j + 1)) * maze.cellWidth, 1, i + (maze.cellHeight / 2)) // position
+            new OIMO.Vec3((Math.ceil(maze.width / 2) - (j + 1)) * maze.cellWidth, 1, -(i * maze.cellHeight) + (maze.cellHeight / 2)) // position
           ]);
         }
         if (cell.hasLeftWall) {
           walls.push([
             new OIMO.Vec3(0.1, 1, maze.cellHeight), // size
-            new OIMO.Vec3((Math.ceil((maze.width / 2) - (j + 1)) * maze.cellWidth) - (maze.cellWidth / 2), 1, i) // position
+            new OIMO.Vec3((Math.ceil((maze.width / 2) - (j + 1)) * maze.cellWidth) - (maze.cellWidth / 2), 1, -(i * maze.cellHeight)) // position
           ]);
         }
         objects.push({position: new OIMO.Vec3(Math.ceil(maze.width / 2) - (j + 1), 1, i), walls});

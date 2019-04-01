@@ -157,9 +157,7 @@ export default class Game {
       for (let wall of object.walls) {
         let wallGeometry = new BoxGeometry(wall[0].x, wall[0].y * length, wall[0].z);
         let wallMesh = new Mesh(wallGeometry, material);
-        wallMesh.translateY(width * wall[1].x * 5);
         this._scene.add(wallMesh);
-        console.log(wall[1].x * width, wall[1].y, wall[1].z);
         this._bodies.push([wallMesh, this._world.add({
           type: 'box', // type of shape : sphere, box, cylinder
           size: [

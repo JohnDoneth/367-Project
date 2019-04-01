@@ -15,6 +15,7 @@ export default class Maze {
     this._cells = [];
 
     this.createCells();
+    this.randomize();
   }
 
   private createCells() {
@@ -22,13 +23,20 @@ export default class Maze {
     for (let i = 0; i < this._height; i++) {
       for (let j = 0; j < this._width; j++) {
         this._cells.push(new Cell(count, j, i, this._cellWidth, this._cellHeight));
+        this._cells[count].hasBotWall = true;
         count++;
       }
     }
   }
 
   private randomize() {
+    let currentCell: Cell = this._cells[0];
+    currentCell.visited = true;
+  }
 
+  private checkNeighbors(cell: Cell) {
+    const neighbors: Cell[] = [];
+    const top = this._cells[cell.col + cell.row * this._width];
   }
 
   get width(): number {
@@ -52,4 +60,4 @@ export default class Maze {
   }
 }
 
-export const MAZE_ONE = new Maze(3, 1, 5, 5);
+export const MAZE_ONE = new Maze(5, 5, 5, 5);
