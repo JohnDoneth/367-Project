@@ -29,15 +29,22 @@ export default class Maze {
   }
 
   private randomize(startingCell: Cell) {
+    const stack: Cell[] = [];
     let currentCell: Cell = startingCell;
     let nextCell: Cell | number = this.getNextNeighbor(currentCell);
+    let running: boolean = true;
     currentCell.visited = true;
-    while (nextCell !== -1) {
+    while (running) {
       nextCell = this.getNextNeighbor(currentCell);
       if (nextCell !== -1) {
+        stack.push(currentCell);
         this.removeWalls(currentCell, nextCell as Cell);
         currentCell = nextCell as Cell;
         currentCell.visited = true;
+      } else if (stack.length > 0) {
+        currentCell = stack.pop();
+      } else {
+        running = false;
       }
     }
   }
