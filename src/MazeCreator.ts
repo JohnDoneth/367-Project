@@ -10,6 +10,7 @@ export interface IMazeResults {
 interface IMazeObject {
   walls: any[];
   position: any;
+  cell: Cell;
 }
 
 class MazeCreator {
@@ -60,7 +61,7 @@ class MazeCreator {
             new OIMO.Vec3((Math.ceil((maze.width / 2) - (j + 1)) * maze.cellWidth) - (maze.cellWidth / 2), 1, -(i * maze.cellHeight)) // position
           ]);
         }
-        objects.push({position: new OIMO.Vec3(Math.ceil(maze.width / 2) - (j + 1), 1, i), walls});
+        objects.push({position: new OIMO.Vec3(Math.ceil(maze.width / 2) - (j + 1), 1, i), walls, cell});
         count++
       }
     }

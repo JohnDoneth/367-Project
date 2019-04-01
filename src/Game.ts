@@ -65,10 +65,11 @@ export default class Game {
     this._renderer.shadowMap.type = PCFSoftShadowMap; // default
 
     this._camera = new PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-    this._camera.position.z = 8;
+    this._camera.position.y = 12;
+    this._camera.rotateX(-(Math.PI / 2));
     this._scene.add(this._camera);
 
-    this._ambientLight = new AmbientLight(0x707070); // soft white light
+    this._ambientLight = new AmbientLight(0x707070, 2.0); // soft white light
     this._scene.add(this._ambientLight);
 
     this._spotLight = new SpotLight(0xffffff);
@@ -82,7 +83,7 @@ export default class Game {
     this._spotLight.shadow.camera.far = 1000; // default
     this._spotLight.shadow.radius = 1.5;
     this._spotLight.shadow.bias = 0.0001;
-    this._scene.add(this._spotLight);
+    // this._scene.add(this._spotLight);
 
     document.body.appendChild(stats.dom);
     document.body.appendChild(this._renderer.domElement);
@@ -129,11 +130,18 @@ export default class Game {
     this._bodies = [];
     const results: IMazeResults = MazeCreator.create(MAZE_ONE);
     const material = new MeshPhongMaterial({color: 0x1F85DE, specular: 0xffffff, reflectivity: 0.8, shininess: 1.0});
+    const wallMaterial = new MeshPhongMaterial({color: 0xFFFFFF, specular: 0xffffff, reflectivity: 0.8, shininess: 1.0});
+    const visitedMaterial = new MeshPhongMaterial({color: 0xFF00FF, specular: 0xffffff, reflectivity: 0.8, shininess: 1.0});
     for (let object of results.objects) {
       const length = MAZE_ONE.cellHeight;
       const width = MAZE_ONE.cellWidth;
       let planeGeometry = new BoxGeometry(width, 0.25, length);
-      let planeMesh = new Mesh(planeGeometry, material);
+      let planeMesh;
+      if (object.cell.visited) {
+        planeMesh = new Mesh(planeGeometry, visitedMaterial);
+      } else {
+        planeMesh = new Mesh(planeGeometry, material);
+      }
       planeMesh.receiveShadow = true;
       this._bodies.push([planeMesh, this._world.add({
         type: 'box', // type of shape : sphere, box, cylinder
@@ -156,7 +164,7 @@ export default class Game {
 
       for (let wall of object.walls) {
         let wallGeometry = new BoxGeometry(wall[0].x, wall[0].y * length, wall[0].z);
-        let wallMesh = new Mesh(wallGeometry, material);
+        let wallMesh = new Mesh(wallGeometry, wallMaterial);
         this._scene.add(wallMesh);
         this._bodies.push([wallMesh, this._world.add({
           type: 'box', // type of shape : sphere, box, cylinder
@@ -177,34 +185,6 @@ export default class Game {
 
       this._scene.add(planeMesh);
     }
-    // for (let wall of results.wallCoords) {
-    //   const length = MAZE_ONE.cellHeight;
-    //   const width = MAZE_ONE.cellWidth;
-    //   let planeGeometry = new BoxGeometry(wall[0].x, wall[0].y * length, wall[0].z);
-    //   let planeMesh = new Mesh(planeGeometry, material);
-    //   planeMesh.receiveShadow = true;
-    //   this._scene.add(planeMesh);
-    //   console.log(wall);
-    //   console.log(wall[1].x, 0, wall[1].z);
-    //   this._bodies.push([planeMesh, this._world.add({
-    //     type: 'box', // type of shape : sphere, box, cylinder
-    //     size: [
-    //       wall[0].x, wall[0].y * length, wall[0].z
-    //     ], // size of shape
-    //     pos: [
-    //       0.0175 + wall[1].x, -0.5, wall[1].z - 2.5
-    //     ], // start position in degree
-    //     rot: [
-    //       0, 0, 0
-    //     ], // start rotation in degree
-    //     move: false, // dynamic or statique
-    //     density: 1,
-    //     friction: 0.2,
-    //     restitution: 0.2,
-    //     belongsTo: 1, // The bits of the collision groups to which the shape belongs.
-    //     collidesWith: 0xffffffff, // The bits of the collision groups with which the shape collides.
-    //   })]);
-    // }
   }
 
   private createPlayer() {
@@ -268,7 +248,7 @@ export default class Game {
 
   private updateCameraPosition() {
     this._camera.position.x = this._playerBody.position.x;
-    this._camera.position.z = this._playerBody.position.z + 8;
+    this._camera.position.z = this._playerBody.position.z;
   }
 
   private onWindowResize() {

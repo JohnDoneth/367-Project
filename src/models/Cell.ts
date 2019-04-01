@@ -21,10 +21,10 @@ export default class Cell {
 
     this._visited = false;
 
-    this._hasTopWall = false;
-    this._hasBotWall = false;
-    this._hasLeftWall = false;
-    this._hasRightWall = false;
+    this._hasTopWall = true;
+    this._hasBotWall = true;
+    this._hasLeftWall = true;
+    this._hasRightWall = true;
   }
 
   get id(): number {
