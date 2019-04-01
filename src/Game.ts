@@ -41,7 +41,7 @@ export default class Game {
       AudioManager.getAudio(0).setBuffer(buffer);
       AudioManager.getAudio(0).setLoop(true);
       AudioManager.getAudio(0).setVolume(0.2);
-      // AudioManager.getAudio(0).play();
+      AudioManager.getAudio(0).play();
     });
 
     AudioManager.load("./media/die.mp3", (buffer: any) => {
@@ -56,6 +56,7 @@ export default class Game {
   }
 
   private initCanvas() {
+    console.log("Initializing canvas...");
     stats.showPanel(0);
 
     this._scene = new Scene();
