@@ -95,12 +95,12 @@ export default class Game {
       ._scene
       .add(this._camera);
 
-    this._ambientLight = new AmbientLight(0x707070, 1.50); // soft white light
+    this._ambientLight = new AmbientLight(0x707070, 2.50); // soft white light
     this
       ._scene
       .add(this._ambientLight);
 
-    this._pointLight = new PointLight(0xffffff, 1, 100)
+    this._pointLight = new PointLight(0xffffff, 0.3, 100)
     this._pointLight.castShadow = true;
     this
       ._scene
