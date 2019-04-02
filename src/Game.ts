@@ -66,7 +66,7 @@ export default class Game {
     this._renderer.shadowMap.type = PCFSoftShadowMap; // default
 
     this._camera = new PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-    this._camera.position.y = 12;
+    this._camera.position.y = 40;
     this._camera.rotateX(-(Math.PI / 2));
     this._scene.add(this._camera);
 
@@ -131,38 +131,35 @@ export default class Game {
     this._bodies = [];
     const results: IMazeResults = MazeCreator.create(MAZE_ONE);
     const material = new MeshPhongMaterial({color: 0x1F85DE, specular: 0xffffff, reflectivity: 0.8, shininess: 1.0});
-    const wallMaterial = new MeshPhongMaterial({color: 0xFFFFFF, specular: 0xffffff, reflectivity: 0.8, shininess: 1.0});
-    const visitedMaterial = new MeshPhongMaterial({color: 0xFF00FF, specular: 0xffffff, reflectivity: 0.8, shininess: 1.0});
-    for (let object of results.objects) {
-      const length = MAZE_ONE.cellHeight;
-      const width = MAZE_ONE.cellWidth;
-      let planeGeometry = new BoxGeometry(width, 0.25, length);
-      let planeMesh;
-      if (object.cell.visited) {
-        planeMesh = new Mesh(planeGeometry, visitedMaterial);
-      } else {
-        planeMesh = new Mesh(planeGeometry, material);
-      }
-      planeMesh.receiveShadow = true;
-      this._bodies.push([planeMesh, this._world.add({
-        type: 'box', // type of shape : sphere, box, cylinder
-        size: [
-          width, 0.25, length
-        ], // size of shape
-        pos: [
-          width * object.position.x, -3 * object.position.y, -object.position.z * length
-        ], // start position in degree
-        rot: [
-          0, 0, 0
-        ], // start rotation in degree
-        move: false, // dynamic or statique
-        density: 1,
-        friction: 0.2,
-        restitution: 0.2,
-        belongsTo: 1, // The bits of the collision groups to which the shape belongs.
-        collidesWith: 0xffffffff, // The bits of the collision groups with which the shape collides.
-      })]);
+    const length = MAZE_ONE.cellHeight;
+    const width = MAZE_ONE.cellWidth;
 
+    /* Generate Maze Floor */
+    const floorGeometry = new BoxGeometry(width * MAZE_ONE.width, 0.25, length * MAZE_ONE.height);
+    const floorMesh = new Mesh(floorGeometry, material);
+    floorMesh.receiveShadow = true;
+    this._scene.add(floorMesh);
+    this._bodies.push([floorMesh, this._world.add({
+      type: 'box', // type of shape : sphere, box, cylinder
+      size: [
+        width * MAZE_ONE.width, 0.25, length * MAZE_ONE.height
+      ], // size of shape
+      pos: [
+        0, -3, -(length * MAZE_ONE.height / 2) + (length / 2)
+      ], // start position in degree
+      rot: [
+        0, 0, 0
+      ], // start rotation in degree
+      move: false, // dynamic or statique
+      density: 1,
+      friction: 0.2,
+      restitution: 0.2,
+      belongsTo: 1, // The bits of the collision groups to which the shape belongs.
+      collidesWith: 0xffffffff, // The bits of the collision groups with which the shape collides.
+    })]);
+
+    const wallMaterial = new MeshPhongMaterial({color: 0xFFFFFF, specular: 0xffffff, reflectivity: 0.8, shininess: 1.0});
+    for (let object of results.objects) {
       for (let wall of object.walls) {
         let wallGeometry = new BoxGeometry(wall[0].x, wall[0].y * length, wall[0].z);
         let wallMesh = new Mesh(wallGeometry, wallMaterial);
@@ -183,8 +180,6 @@ export default class Game {
           collidesWith: 0xffffffff, // The bits of the collision groups with which the shape collides.
         })]);
       }
-
-      this._scene.add(planeMesh);
     }
   }
 
