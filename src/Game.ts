@@ -27,6 +27,8 @@ export default class Game {
   private _ambientLight : AmbientLight;
   private _player : Mesh;
 
+  private _xAxisOrientation;
+  private _yAxisOrientation;
   private _pointLight : PointLight;
 
   /* Physics objects */
@@ -73,11 +75,22 @@ export default class Game {
 
     this.initCanvas();
   }
+  
+  private handleOrientation(event){ 
+	  var x = event.beta;
+	  var y = event.gamma;
+      console.log("x: " + x);
+	  this._xAxisOrientation = x;
+	  console.log("y: " + y);
+	  this._yAxisOrientation = y;
+  }
 
   private initCanvas() {
     console.log("Initializing canvas...");
     stats.showPanel(0);
 
+	this._yAxisOrientation = 0;
+	this._xAxisOrientation = 0;
     this._scene = new Scene();
     this._renderer = new WebGLRenderer({antialias: true});
     this
@@ -117,8 +130,13 @@ export default class Game {
 
     this.createPlayer();
     this.initPhysics();
+		
+	
+	window.addEventListener("deviceorientation", this.handleOrientation, true);
+	
     this.render();
   }
+ 
 
   private initPhysics() {
     this._world = new OIMO.World({
@@ -276,7 +294,7 @@ export default class Game {
 
     const PLAYER_IMPULSE = 1.0;
 
-    if (this._keys["ArrowUp"]) {
+    if (this._keys["ArrowUp"] || this._yAxisOrientation > 50) {
       this
         ._playerBody
         .awake();
@@ -285,7 +303,7 @@ export default class Game {
         .applyImpulse(new OIMO.Vec3(0, 0, 0), new OIMO.Vec3(0, 0, -PLAYER_IMPULSE));
     }
 
-    if (this._keys["ArrowDown"]) {
+    if (this._keys["ArrowDown"] || this._yAxisOrientation < -50) {
       this
         ._playerBody
         .awake();
