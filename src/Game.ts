@@ -16,6 +16,11 @@ import MazeCreator, {IMazeResults} from "./MazeCreator";
 import listen from "key-state";
 import {MAZE_ONE} from "./models/Maze";
 
+
+var xAxisOrientation;
+var yAxisOrientation;
+var zAxisOrientation;
+
 const stats = require("stats.js")();
 const OIMO = require("oimo");
 
@@ -27,8 +32,6 @@ export default class Game {
   private _ambientLight : AmbientLight;
   private _player : Mesh;
 
-  private _xAxisOrientation;
-  private _yAxisOrientation;
   private _pointLight : PointLight;
 
   /* Physics objects */
@@ -41,6 +44,10 @@ export default class Game {
 
   constructor() {
     this._keys = listen(window);
+
+    screen.orientation.lock("portrait");
+
+    window.addEventListener("deviceorientation", this.handleOrientation, true);
 
     AudioManager.load("./media/ripped.mp3", (buffer : any) => {
       AudioManager
@@ -77,20 +84,17 @@ export default class Game {
   }
   
   private handleOrientation(event){ 
-	  var x = event.beta;
-	  var y = event.gamma;
-      console.log("x: " + x);
-	  this._xAxisOrientation = x;
-	  console.log("y: " + y);
-	  this._yAxisOrientation = y;
+    var x = event.gamma;
+    var y = event.beta;
+    var z = event.alpha;
+	  xAxisOrientation = x;
+    yAxisOrientation = y;
+    zAxisOrientation = z;
   }
 
   private initCanvas() {
     console.log("Initializing canvas...");
     stats.showPanel(0);
-
-	this._yAxisOrientation = 0;
-	this._xAxisOrientation = 0;
     this._scene = new Scene();
     this._renderer = new WebGLRenderer({antialias: true});
     this
@@ -130,9 +134,6 @@ export default class Game {
 
     this.createPlayer();
     this.initPhysics();
-		
-	
-	window.addEventListener("deviceorientation", this.handleOrientation, true);
 	
     this.render();
   }
@@ -293,8 +294,9 @@ export default class Game {
     }
 
     const PLAYER_IMPULSE = 1.0;
+   
 
-    if (this._keys["ArrowUp"] || this._yAxisOrientation > 50) {
+    if (this._keys["ArrowUp"] || yAxisOrientation > 50) {
       this
         ._playerBody
         .awake();
@@ -303,7 +305,7 @@ export default class Game {
         .applyImpulse(new OIMO.Vec3(0, 0, 0), new OIMO.Vec3(0, 0, -PLAYER_IMPULSE));
     }
 
-    if (this._keys["ArrowDown"] || this._yAxisOrientation < -50) {
+    else if (this._keys["ArrowDown"] || yAxisOrientation < -50) {
       this
         ._playerBody
         .awake();
@@ -312,7 +314,7 @@ export default class Game {
         .applyImpulse(new OIMO.Vec3(0, 0, 0), new OIMO.Vec3(0, 0, PLAYER_IMPULSE));
     }
 
-    if (this._keys["ArrowLeft"]) {
+    else if (this._keys["ArrowLeft"]) {
       this
         ._playerBody
         .awake();
@@ -321,13 +323,21 @@ export default class Game {
         .applyImpulse(new OIMO.Vec3(0, 0, 0), new OIMO.Vec3(-PLAYER_IMPULSE, 0, 0));
     }
 
-    if (this._keys["ArrowRight"]) {
+    else if (this._keys["ArrowRight"]) {
       this
         ._playerBody
         .awake();
       this
         ._playerBody
         .applyImpulse(new OIMO.Vec3(0, 0, 0), new OIMO.Vec3(PLAYER_IMPULSE, 0, 0));
+    }
+    else{
+      this
+      ._playerBody
+      .awake();
+    this
+      ._playerBody
+      .applyImpulse(new OIMO.Vec3(0, 0, 0), new OIMO.Vec3(xAxisOrientation/10, 0, yAxisOrientation/10));
     }
 
     if (this._playerBody.position.y <= -25.0) {
