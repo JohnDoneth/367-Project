@@ -32,6 +32,8 @@ export default class Game {
   private _ambientLight : AmbientLight;
   private _player : Mesh;
 
+  private timer;
+
   private _pointLight : PointLight;
 
   /* Physics objects */
@@ -271,6 +273,15 @@ export default class Game {
       ._scene
       .add(this._player);
 
+    var counter = 0
+    this.timer = setInterval(() => {
+        var minutes = Math.floor(counter / 60);
+        var formattedMinutes = ("0" + minutes).slice(-2);
+        var seconds = counter % 60;
+        var formattedSeconds = ("0" + seconds).slice(-2);
+        document.getElementById("timer").innerHTML = formattedMinutes + ":" + formattedSeconds;
+        counter++;
+      }, 1000)
   }
 
   public copyPhysicsProperties(target : Mesh, body : any) {

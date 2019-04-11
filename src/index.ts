@@ -10,6 +10,7 @@ class MazeGame {
     const startScreen = document.getElementById("start-screen");
     startScreen.getElementsByTagName("button")[0].addEventListener("click", () => {
       document.getElementById("start-screen").style.display = "none";
+      document.getElementById("timer").style.display = "block";
       this._game = new Game();
     });
   }

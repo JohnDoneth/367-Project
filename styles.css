@@ -27,10 +27,24 @@ canvas {
   font-family: "Arial Black", Gadget, sans-serif;
 }
 
+#timer-screen {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
+  background-color: #232323;
+  font-family: "Arial Black", Gadget, sans-serif;
+}
+
 #start-screen > h1 {
   color: #FFFFFF;
   font-size: 10em;
   text-shadow: 5px 1px 2px #757575;
+}
+
+#timer-screen > h3 {
+  display: none;
+  color: #FFFFFF;
 }
 
 #start-screen > button {
