@@ -47,6 +47,7 @@ export default class Maze {
         running = false;
       }
     }
+    this.createExit(this._cells[this._cells.length - 1]);
   }
 
   private getNextNeighbor(cell: Cell): Cell | number {
@@ -97,6 +98,40 @@ export default class Maze {
     } else if (y === -1) {
       thisCell.hasTopWall = false;
       nextCell.hasBotWall = false;
+    }
+  }
+
+  private createExit(exitCell: Cell) {
+    const cellWalls: number[] = [];
+    if (exitCell.hasTopWall) {
+      cellWalls.push(0);
+    }
+    if (exitCell.hasRightWall) {
+      cellWalls.push(1);
+    }
+    if (exitCell.hasBotWall) {
+      cellWalls.push(2);
+    }
+    if (exitCell.hasLeftWall) {
+      cellWalls.push(3);
+    }
+    const cellWall = Math.floor(Math.random() * cellWalls.length);
+    const exitWall = cellWalls[cellWall];
+    switch (exitWall) {
+      case 0:
+        exitCell.hasTopWall = false;
+        break;
+      case 1:
+        exitCell.hasRightWall = false;
+        break;
+      case 2:
+        exitCell.hasBotWall = false;
+        break;
+      case 3:
+        exitCell.hasLeftWall = false;
+        break;
+      default:
+        exitCell.hasTopWall = false;
     }
   }
 
