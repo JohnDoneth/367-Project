@@ -296,7 +296,7 @@ export default class Game {
     const PLAYER_IMPULSE = 1.0;
    
 
-    if (this._keys["ArrowUp"] || yAxisOrientation > 50) {
+    if (this._keys["ArrowUp"]) {
       this
         ._playerBody
         .awake();
@@ -305,7 +305,7 @@ export default class Game {
         .applyImpulse(new OIMO.Vec3(0, 0, 0), new OIMO.Vec3(0, 0, -PLAYER_IMPULSE));
     }
 
-    else if (this._keys["ArrowDown"] || yAxisOrientation < -50) {
+    else if (this._keys["ArrowDown"]) {
       this
         ._playerBody
         .awake();
