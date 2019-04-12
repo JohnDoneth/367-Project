@@ -21,6 +21,9 @@ var xAxisOrientation;
 var yAxisOrientation;
 var zAxisOrientation;
 
+var currentLevel;
+var currentTime;
+
 const stats = require("stats.js")();
 const OIMO = require("oimo");
 
@@ -47,6 +50,8 @@ export default class Game {
   constructor() {
     this._keys = listen(window);
 
+    currentTime = 0;
+    currentLevel = 1;
     screen.orientation.lock("portrait");
 
     window.addEventListener("deviceorientation", this.handleOrientation, true);
@@ -175,12 +180,14 @@ export default class Game {
   }
 
   private initLevel() {
+
     this._bodies = [];
     const results : IMazeResults = MazeCreator.create(MAZE_ONE);
     const material = new MeshPhongMaterial({color: 0x1F85DE, specular: 0xffffff, reflectivity: 0.8, shininess: 1.0});
     const length = MAZE_ONE.cellHeight;
     const width = MAZE_ONE.cellWidth;
 
+    document.getElementById("levelNum").innerHTML = "" + currentLevel;
     /* Generate Maze Floor */
     const floorGeometry = new BoxGeometry(width * MAZE_ONE.width, 0.25, length * MAZE_ONE.height);
     const floorMesh = new Mesh(floorGeometry, material);
@@ -273,15 +280,18 @@ export default class Game {
       ._scene
       .add(this._player);
 
-    var counter = 0
     this.timer = setInterval(() => {
-        var minutes = Math.floor(counter / 60);
-        var formattedMinutes = ("0" + minutes).slice(-2);
-        var seconds = counter % 60;
-        var formattedSeconds = ("0" + seconds).slice(-2);
-        document.getElementById("timer").innerHTML = formattedMinutes + ":" + formattedSeconds;
-        counter++;
+        document.getElementById("timer").innerHTML = this.formatTime(currentTime);
+        currentTime++;
       }, 1000)
+  }
+
+  private formatTime(val: number){
+    var minutes = Math.floor(val / 60);
+    var formattedMinutes = ("0" + minutes).slice(-2);
+    var seconds = val % 60;
+    var formattedSeconds = ("0" + seconds).slice(-2);
+    return formattedMinutes + ":" + formattedSeconds;
   }
 
   public copyPhysicsProperties(target : Mesh, body : any) {
@@ -359,6 +369,10 @@ export default class Game {
       AudioManager
         .getAudio(1)
         .play();
+
+      currentLevel++;
+      currentTime = 0;
+      this.initLevel();
     }
 
     this

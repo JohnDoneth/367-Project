@@ -45,6 +45,7 @@ canvas {
 #timer-screen > h3 {
   display: none;
   color: #FFFFFF;
+  margin:0;
 }
 
 #start-screen > button {
