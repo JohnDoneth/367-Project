@@ -24,8 +24,13 @@ var zAxisOrientation;
 var currentLevel;
 var currentTime;
 
+var usedHint = false;
+
 const stats = require("stats.js")();
 const OIMO = require("oimo");
+
+const hintButton = document.getElementById("timer-screen").getElementsByTagName("button")[0]
+
 
 export default class Game {
   /* Elements for the scene */
@@ -50,6 +55,27 @@ export default class Game {
   constructor() {
     this._keys = listen(window);
 
+    usedHint = false;
+    console.log("Used hint false");
+    hintButton.addEventListener("click", () => {
+      var hintTime = 0;
+      var hinttimer = setInterval(() => {
+        usedHint = true;
+        console.log("Used hint true");
+
+        this
+        ._scene
+        .add(this._ambientLight);
+        hintTime++;
+        if (hintTime > 3 && usedHint){
+          this
+        ._scene
+        .remove(this._ambientLight);
+        hintButton.style.display = "none";
+        clearInterval(hinttimer);
+        }
+      }, 1000)
+    });
     currentTime = 0;
     currentLevel = 1;
     screen.orientation.lock("portrait");
@@ -119,10 +145,7 @@ export default class Game {
       ._scene
       .add(this._camera);
 
-    this._ambientLight = new AmbientLight(0x707070, 2.50); // soft white light
-    this
-      ._scene
-      .add(this._ambientLight);
+    this._ambientLight = new AmbientLight(0x707070, 0.25); // soft white light
 
     this._pointLight = new PointLight(0xffffff, 0.3, 100)
     this._pointLight.castShadow = true;
@@ -260,7 +283,7 @@ export default class Game {
       }
 
       this._camera.position.z = -20.0;
-      this._camera.position.y = 60.0;
+      this._camera.position.y = 30.0;
 
     }
   }
@@ -370,8 +393,11 @@ export default class Game {
         .getAudio(1)
         .play();
 
+      hintButton.style.display = "block";
       currentLevel++;
       currentTime = 0;
+      usedHint = false;
+      console.log("Used hint false");
       this.initLevel();
     }
 

@@ -48,6 +48,17 @@ canvas {
   margin:0;
 }
 
+#timer-screen > button {
+  width: 5vw;
+  height: 2vw;
+  font-size: 1vw;
+  display: hidden;
+  background-color: #ced4da;
+  color: #232323;
+  border-radius: 1vw;
+  outline: none;
+}
+
 #start-screen > button {
   width: 20vw;
   height: 7.5vw;
