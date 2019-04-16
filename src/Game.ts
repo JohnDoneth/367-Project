@@ -174,40 +174,6 @@ export default class Game {
 
     window.addEventListener('resize', this.onWindowResize, false);
 
-    /* Effects */
-
-    const renderPass = new RenderPass(this._scene, this._camera);
-    renderPass.renderToScreen = false;
-
-    const bloomPass = new EffectPass(this._camera, new BloomEffect({
-      distinction: 0.1,
-      kernelSize: KernelSize.LARGE,
-      blendFunction: BlendFunction.SOFT_LIGHT,
-    }));
-    bloomPass.renderToScreen = true;
-
-    this._composer = new EffectComposer(this._renderer);
-    this._composer.addPass(renderPass);
-    this._composer.addPass(bloomPass);
-    //this._composer.addPass(normalPass);
-    //this._composer.addPass(effectPass);
-
-    /* Init level */
-
-    this._ballShadows = []
-
-    for (let index = 0; index < 20; index++) {
-      let material = new MeshPhongMaterial({color: 0xf0f0f0, specular: 0xffffff, reflectivity: 0.8, shininess: 1.0});
-      let geometry = new SphereBufferGeometry(1.0, 16, 4);
-
-      let mesh: any = new Mesh(geometry, material);
-      mesh.isAlive = false;
-
-      this._ballShadows.push(mesh);
-      this._scene.add(mesh)
-    }
-
-
     this.createPlayer();
     this.initPhysics();
 	
@@ -233,6 +199,37 @@ export default class Game {
   this
     ._scene
     .add(this._pointLight);
+
+        /* Effects */
+    const renderPass = new RenderPass(this._scene, this._camera);
+    renderPass.renderToScreen = false;
+
+    const bloomPass = new EffectPass(this._camera, new BloomEffect({
+      distinction: 0.1,
+      kernelSize: KernelSize.LARGE,
+      blendFunction: BlendFunction.SOFT_LIGHT,
+    }));
+    bloomPass.renderToScreen = true;
+
+    this._composer = new EffectComposer(this._renderer);
+    this._composer.addPass(renderPass);
+    this._composer.addPass(bloomPass);
+    //this._composer.addPass(normalPass);
+    //this._composer.addPass(effectPass);
+
+    this._ballShadows = []
+
+    for (let index = 0; index < 20; index++) {
+      let material = new MeshPhongMaterial({color: 0xf0f0f0, specular: 0xffffff, reflectivity: 0.8, shininess: 1.0});
+      let geometry = new SphereBufferGeometry(1.0, 16, 4);
+
+      let mesh: any = new Mesh(geometry, material);
+      mesh.isAlive = false;
+
+      this._ballShadows.push(mesh);
+      this._scene.add(mesh)
+    }
+
   }
  
 
