@@ -14,7 +14,7 @@ class MazeGame {
       document.getElementById("timer").style.display = "inline";
       document.getElementById("level").style.display="inline";
       document.getElementById("score").style.display="inline";
-      this._game = new Game(false);
+      this._game = new Game(false, document.getElementById("ballTrail").checked);
     });
     startScreen.getElementsByTagName("button")[1].addEventListener("click", () => {
       document.getElementById("start-screen").style.display = "none";
@@ -22,7 +22,7 @@ class MazeGame {
       document.getElementById("level").style.display="inline";
       document.getElementById("hint").style.display="inline";
       document.getElementById("score").style.display="inline";
-      this._game = new Game(true);
+      this._game = new Game(true, false);
     });
   }
 }

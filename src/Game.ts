@@ -56,15 +56,17 @@ export default class Game {
   private _keys : any;
 
   private _nightMode : boolean;
+  private _ballTrail : boolean;
 
   /* Post Processing */
   private _composer: EffectComposer;
   private _ballShadows: any[]
 
-  constructor(nightMode: boolean) {
+  constructor(nightMode: boolean, ballTrail: boolean) {
 
     this._keys = listen(window);
 
+    this._ballTrail = ballTrail;
     this._nightMode = nightMode;
     usedHint = false;
     console.log("Used hint false");
@@ -200,6 +202,7 @@ export default class Game {
     ._scene
     .add(this._pointLight);
 
+    if (this._ballTrail){
         /* Effects */
     const renderPass = new RenderPass(this._scene, this._camera);
     renderPass.renderToScreen = false;
@@ -228,6 +231,7 @@ export default class Game {
 
       this._ballShadows.push(mesh);
       this._scene.add(mesh)
+    }
     }
 
   }
@@ -392,11 +396,15 @@ export default class Game {
 
     const deltaTime = clock.getDelta();
     
-    /*this
-      ._renderer
-      .render(this._scene, this._camera);*/
+    if (this._ballTrail){
+      this._composer.render(deltaTime);
+    }
+    else{
+      this
+        ._renderer
+        .render(this._scene, this._camera);
+    }
 
-    this._composer.render(deltaTime);
 
     stats.update();
 
@@ -405,6 +413,8 @@ export default class Game {
       this.copyPhysicsProperties(body[0], body[1]);
     }
 
+    if (this._ballTrail)
+    {
     // Spawn a new shadow every 0.1 ms
     this.timeToSpawn += deltaTime;
     if (this.timeToSpawn > 0.1) {
@@ -422,7 +432,7 @@ export default class Game {
       }
     }
     
-    // Apply effects to each alive shadow
+    //Apply effects to each alive shadow
     this._ballShadows.forEach(element => {
       if (element.isAlive) {
         element.visible = true;
@@ -438,6 +448,7 @@ export default class Game {
         element.visible = false;
       }
     });
+    }
 
     const PLAYER_IMPULSE = 1.0;
    
