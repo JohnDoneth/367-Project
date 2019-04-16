@@ -15,6 +15,7 @@ class MazeGame {
       document.getElementById("level").style.display="inline";
       document.getElementById("levelNum").style.display="inline";
       document.getElementById("hint").style.display="inline";
+      document.getElementById("score").style.display="inline";
       this._game = new Game();
     });
   }

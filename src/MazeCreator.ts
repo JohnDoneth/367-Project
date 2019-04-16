@@ -1,4 +1,4 @@
-import Maze, {MAZE_ONE} from "./models/Maze";
+import Maze from "./models/Maze";
 import Cell from "./models/Cell";
 
 const OIMO = require("oimo");
