@@ -1,5 +1,6 @@
 /* These do NOT have Typescript implementations, so we must resolve to module names. */
 import {
+  Clock,
   AmbientLight,
   BoxGeometry,
   Mesh,
@@ -15,7 +16,7 @@ import AudioManager from "./AudioManager";
 import MazeCreator, {IMazeResults} from "./MazeCreator";
 import listen from "key-state";
 import {MAZE_ONE} from "./models/Maze";
-
+import { BlendFunction, BloomEffect, KernelSize, NormalPass, SSAOEffect, OutlineEffect, BokehEffect, VignetteEffect, EffectComposer, EffectPass, RenderPass } from "postprocessing";
 
 var xAxisOrientation;
 var yAxisOrientation;
@@ -26,6 +27,8 @@ var currentTime;
 
 const stats = require("stats.js")();
 const OIMO = require("oimo");
+
+const clock = new Clock();
 
 export default class Game {
   /* Elements for the scene */
@@ -47,12 +50,15 @@ export default class Game {
   /* Player movement */
   private _keys : any;
 
+  /* Post Processing */
+  private _composer: EffectComposer;
+
   constructor() {
     this._keys = listen(window);
 
     currentTime = 0;
     currentLevel = 1;
-    screen.orientation.lock("portrait");
+    //screen.orientation.lock("portrait");
 
     window.addEventListener("deviceorientation", this.handleOrientation, true);
 
@@ -107,6 +113,7 @@ export default class Game {
     this
       ._renderer
       .setSize(window.innerWidth, window.innerHeight);
+    this._renderer.setClearColor('#555') 
     this._renderer.shadowMap.enabled = true;
     this._renderer.shadowMap.type = PCFSoftShadowMap; // default
 
@@ -138,6 +145,26 @@ export default class Game {
       .appendChild(this._renderer.domElement);
 
     window.addEventListener('resize', this.onWindowResize, false);
+
+    /* Effects */
+
+    const renderPass = new RenderPass(this._scene, this._camera);
+    renderPass.renderToScreen = false;
+
+    const bloomPass = new EffectPass(this._camera, new BloomEffect({
+      distinction: 0.1,
+      kernelSize: KernelSize.LARGE,
+      blendFunction: BlendFunction.SOFT_LIGHT,
+    }));
+    bloomPass.renderToScreen = true;
+
+    this._composer = new EffectComposer(this._renderer);
+    this._composer.addPass(renderPass);
+    this._composer.addPass(bloomPass);
+    //this._composer.addPass(normalPass);
+    //this._composer.addPass(effectPass);
+
+    /* Init level */
 
     this.createPlayer();
     this.initPhysics();
@@ -304,9 +331,13 @@ export default class Game {
   }
 
   private render() {
-    this
+    
+    /*this
       ._renderer
-      .render(this._scene, this._camera);
+      .render(this._scene, this._camera);*/
+
+    this._composer.render(clock.getDelta());
+
     stats.update();
 
     this.copyPhysicsProperties(this._player, this._playerBody);
