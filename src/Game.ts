@@ -18,7 +18,19 @@ import AudioManager from "./AudioManager";
 import MazeCreator, {IMazeResults} from "./MazeCreator";
 import listen from "key-state";
 import Maze from "./models/Maze";
-import { BlendFunction, BloomEffect, KernelSize, NormalPass, SSAOEffect, OutlineEffect, BokehEffect, VignetteEffect, EffectComposer, EffectPass, RenderPass } from "postprocessing";
+import {
+  BlendFunction,
+  BloomEffect,
+  KernelSize,
+  NormalPass,
+  SSAOEffect,
+  OutlineEffect,
+  BokehEffect,
+  VignetteEffect,
+  EffectComposer,
+  EffectPass,
+  RenderPass
+} from "postprocessing";
 
 var xAxisOrientation;
 var yAxisOrientation;
@@ -33,7 +45,9 @@ var usedHint = false;
 const stats = require("stats.js")();
 const OIMO = require("oimo");
 
-const hintButton = document.getElementById("timer-screen").getElementsByTagName("button")[0]
+const hintButton = document
+  .getElementById("timer-screen")
+  .getElementsByTagName("button")[0]
 const clock = new Clock();
 
 export default class Game {
@@ -57,19 +71,18 @@ export default class Game {
   private _keys : any;
 
   private _nightMode : boolean;
-  private _ballTrail : boolean;
+  private _postProcessing : boolean;
 
   /* Post Processing */
-  private _composer: EffectComposer;
-  private _ballShadows: any[];
-  private _hitWallFlag: boolean = false;
+  private _composer : EffectComposer;
+  private _ballShadows : any[];
+  private _hitWallFlag : boolean = false;
 
-
-  constructor(nightMode: boolean, ballTrail: boolean) {
+  constructor(nightMode : boolean, shaders : boolean) {
 
     this._keys = listen(window);
 
-    this._ballTrail = ballTrail;
+    this._postProcessing = shaders;
 
     this._nightMode = nightMode;
     usedHint = false;
@@ -81,19 +94,19 @@ export default class Game {
         console.log("Used hint true");
 
         this
-        ._scene
-        .add(this._ambientLight);
+          ._scene
+          .add(this._ambientLight);
         this._camera.position.y = 75.0;
 
         hintTime++;
-        if (hintTime > 3 && usedHint){
+        if (hintTime > 3 && usedHint) {
           this
-        ._scene
-        .remove(this._ambientLight);
-        this._camera.position.y = 45.0;
+            ._scene
+            .remove(this._ambientLight);
+          this._camera.position.y = 45.0;
 
-        hintButton.style.display = "none";
-        clearInterval(hinttimer);
+          hintButton.style.display = "none";
+          clearInterval(hinttimer);
         }
       }, 1000)
     });
@@ -147,22 +160,24 @@ export default class Game {
     this.initCanvas();
 
     this.timer = setInterval(() => {
-      document.getElementById("timer").innerHTML = "Time: " + this.formatTime(currentTime);
+      document
+        .getElementById("timer")
+        .innerHTML = "Time: " + this.formatTime(currentTime);
       currentTime++;
     }, 1000)
   }
 
   private playCollisionSound() {
     AudioManager
-        .getAudio(2)
-        .play()
+      .getAudio(2)
+      .play()
   }
-  
-  private handleOrientation(event){ 
+
+  private handleOrientation(event) {
     var x = event.gamma;
     var y = event.beta;
     var z = event.alpha;
-	  xAxisOrientation = x;
+    xAxisOrientation = x;
     yAxisOrientation = y;
     zAxisOrientation = z;
   }
@@ -174,7 +189,9 @@ export default class Game {
     this
       ._renderer
       .setSize(window.innerWidth, window.innerHeight);
-    this._renderer.setClearColor('#555');
+    this
+      ._renderer
+      .setClearColor('#555');
     this._renderer.shadowMap.enabled = true;
     this._renderer.shadowMap.type = PCFSoftShadowMap; // default
 
@@ -197,47 +214,49 @@ export default class Game {
 
     this.createPlayer();
     this.initPhysics();
-	
+
     this.render();
   }
 
-  private initScene(){
+  private initScene() {
     this._scene = new Scene();
 
     this
-    ._scene
-    .add(this._camera);
+      ._scene
+      .add(this._camera);
 
-  if (this._nightMode)
-    this._ambientLight = new AmbientLight(0x707070, 0.5); // soft white light
-  else{
-    this._ambientLight = new AmbientLight(0x707070, 2.5); // soft white light
-    this._scene.add(this._ambientLight);
-  }
+    if (this._nightMode) 
+      this._ambientLight = new AmbientLight(0x707070, 0.5); // soft white light
+    else {
+      this._ambientLight = new AmbientLight(0x707070, 2.5); // soft white light
+      this
+        ._scene
+        .add(this._ambientLight);
+    }
 
-  this._pointLight = new PointLight(0xffffff, 0.3, 100);
-  this._pointLight.castShadow = true;
-  this
-    ._scene
-    .add(this._pointLight);
+    this._pointLight = new PointLight(0xffffff, 0.3, 100);
+    this._pointLight.castShadow = true;
+    this
+      ._scene
+      .add(this._pointLight);
 
-    if (this._ballTrail){
-        /* Effects */
-    const renderPass = new RenderPass(this._scene, this._camera);
-    renderPass.renderToScreen = false;
+    if (this._postProcessing) {
+      /* Effects */
+      const renderPass = new RenderPass(this._scene, this._camera);
+      renderPass.renderToScreen = false;
 
-    const bloomPass = new EffectPass(this._camera, new BloomEffect({
-      distinction: 0.1,
-      kernelSize: KernelSize.LARGE,
-      blendFunction: BlendFunction.SOFT_LIGHT,
-    }));
-    bloomPass.renderToScreen = true;
+      const bloomPass = new EffectPass(this._camera, new BloomEffect({distinction: 0.1, kernelSize: KernelSize.LARGE, blendFunction: BlendFunction.SOFT_LIGHT}));
+      bloomPass.renderToScreen = true;
 
-    this._composer = new EffectComposer(this._renderer);
-    this._composer.addPass(renderPass);
-    this._composer.addPass(bloomPass);
-    //this._composer.addPass(normalPass);
-    //this._composer.addPass(effectPass);
+      this._composer = new EffectComposer(this._renderer);
+      this
+        ._composer
+        .addPass(renderPass);
+      this
+        ._composer
+        .addPass(bloomPass);
+      //this._composer.addPass(normalPass); this._composer.addPass(effectPass);
+    }
 
     this._ballShadows = []
 
@@ -245,16 +264,18 @@ export default class Game {
       let material = new MeshPhongMaterial({color: 0xf0f0f0, specular: 0xffffff, reflectivity: 0.8, shininess: 1.0});
       let geometry = new SphereBufferGeometry(1.0, 16, 4);
 
-      let mesh: any = new Mesh(geometry, material);
+      let mesh : any = new Mesh(geometry, material);
       mesh.isAlive = false;
 
-      this._ballShadows.push(mesh);
-      this._scene.add(mesh)
+      this
+        ._ballShadows
+        .push(mesh);
+      this
+        ._scene
+        .add(mesh)
     }
-  }
 
   }
- 
 
   private initPhysics() {
     this._world = new OIMO.World({
@@ -269,8 +290,7 @@ export default class Game {
     this._playerBody = this
       ._world
       .add({
-        name: 'player',
-        type: 'sphere', // type of shape : sphere, box, cylinder
+        name: 'player', type: 'sphere', // type of shape : sphere, box, cylinder
         size: [
           1, 1, 1
         ], // size of shape
@@ -299,7 +319,9 @@ export default class Game {
     const length = maze.cellHeight;
     const width = maze.cellWidth;
 
-    document.getElementById("level").innerHTML = "Level: " + currentLevel;
+    document
+      .getElementById("level")
+      .innerHTML = "Level: " + currentLevel;
     /* Generate Maze Floor */
     const floorGeometry = new BoxGeometry(width * maze.width, 0.25, length * maze.height);
     const floorMesh = new Mesh(floorGeometry, material);
@@ -352,8 +374,7 @@ export default class Game {
             this
               ._world
               .add({
-                name: 'wall',
-                type: 'box', // type of shape : sphere, box, cylinder
+                name: 'wall', type: 'box', // type of shape : sphere, box, cylinder
                 size: [
                   wall[0].x, wall[0].y * length,
                   wall[0].z
@@ -394,7 +415,7 @@ export default class Game {
       .add(this._player);
   }
 
-  private formatTime(val: number){
+  private formatTime(val : number) {
     var minutes = Math.floor(val / 60);
     var formattedMinutes = ("0" + minutes).slice(-2);
     var seconds = val % 60;
@@ -416,16 +437,16 @@ export default class Game {
   private render() {
 
     const deltaTime = clock.getDelta();
-    
-    if (this._ballTrail){
-      this._composer.render(deltaTime);
-    }
-    else{
-      this
-      ._renderer
-      .render(this._scene, this._camera);
-    }
 
+    if (this._postProcessing) {
+      this
+        ._composer
+        .render(deltaTime);
+    } else {
+      this
+        ._renderer
+        .render(this._scene, this._camera);
+    }
 
     stats.update();
 
@@ -434,7 +455,6 @@ export default class Game {
       this.copyPhysicsProperties(body[0], body[1]);
     }
 
-    if (this._ballTrail){
     if (this._world.checkContact('player', 'wall') && this._hitWallFlag == false) {
       this._hitWallFlag = true;
       this.playCollisionSound();
@@ -451,35 +471,42 @@ export default class Game {
       for (let element of this._ballShadows) {
         if (!element.isAlive) {
           element.isAlive = true;
-          element.scale.setScalar(1.0);
+          element
+            .scale
+            .setScalar(1.0);
           element.timeAlive = 0.0;
           element.material.opacity = 1.0;
-          element.position.set(this._player.position.x, this._player.position.y, this._player.position.z);
+          element
+            .position
+            .set(this._player.position.x, this._player.position.y, this._player.position.z);
           break;
         }
       }
     }
-    
-    // Apply effects to each alive shadow
-    this._ballShadows.forEach(element => {
-      if (element.isAlive) {
-        element.visible = true;
-        element.material.transparent = true;
-        element.material.opacity -= deltaTime
-        element.scale.subScalar(deltaTime);
-        element.timeAlive += deltaTime;
 
-        if (element.timeAlive > 1.0) {
-          element.isAlive = false;
+    // Apply effects to each alive shadow
+    this
+      ._ballShadows
+      .forEach(element => {
+        if (element.isAlive) {
+          element.visible = true;
+          element.material.transparent = true;
+          element.material.opacity -= deltaTime
+          element
+            .scale
+            .subScalar(deltaTime);
+          element.timeAlive += deltaTime;
+
+          if (element.timeAlive > 1.0) {
+            element.isAlive = false;
+          }
+        } else {
+          element.visible = false;
         }
-      } else {
-        element.visible = false;
-      }
-    });
-  }
+      });
 
     const PLAYER_IMPULSE = 1.0;
-   
+
     if (this._keys["ArrowUp"]) {
       this
         ._playerBody
@@ -487,41 +514,34 @@ export default class Game {
       this
         ._playerBody
         .applyImpulse(new OIMO.Vec3(0, 0, 0), new OIMO.Vec3(0, 0, -PLAYER_IMPULSE));
-    }
-
-    else if (this._keys["ArrowDown"]) {
+    } else if (this._keys["ArrowDown"]) {
       this
         ._playerBody
         .awake();
       this
         ._playerBody
         .applyImpulse(new OIMO.Vec3(0, 0, 0), new OIMO.Vec3(0, 0, PLAYER_IMPULSE));
-    }
-
-    else if (this._keys["ArrowLeft"]) {
+    } else if (this._keys["ArrowLeft"]) {
       this
         ._playerBody
         .awake();
       this
         ._playerBody
         .applyImpulse(new OIMO.Vec3(0, 0, 0), new OIMO.Vec3(-PLAYER_IMPULSE, 0, 0));
-    }
-
-    else if (this._keys["ArrowRight"]) {
+    } else if (this._keys["ArrowRight"]) {
       this
         ._playerBody
         .awake();
       this
         ._playerBody
         .applyImpulse(new OIMO.Vec3(0, 0, 0), new OIMO.Vec3(PLAYER_IMPULSE, 0, 0));
-    }
-    else{
+    } else {
       this
-      ._playerBody
-      .awake();
-    this
-      ._playerBody
-      .applyImpulse(new OIMO.Vec3(0, 0, 0), new OIMO.Vec3(xAxisOrientation/10, 0, yAxisOrientation/10));
+        ._playerBody
+        .awake();
+      this
+        ._playerBody
+        .applyImpulse(new OIMO.Vec3(0, 0, 0), new OIMO.Vec3(xAxisOrientation / 10, 0, yAxisOrientation / 10));
     }
 
     if (this._playerBody.position.y <= -25.0) {
@@ -533,12 +553,16 @@ export default class Game {
         .getAudio(1)
         .play();
       currentScore += currentTime;
-      document.getElementById("score").innerHTML = "Score: " + currentScore;
-      if (currentLevel == 10){
+      document
+        .getElementById("score")
+        .innerHTML = "Score: " + currentScore;
+      if (currentLevel == 10) {
         window.alert("You win! Score: " + currentScore);
-        window.location.reload();
+        window
+          .location
+          .reload();
       }
-      if (this._nightMode)
+      if (this._nightMode) 
         hintButton.style.display = "block";
       usedHint = false;
       currentLevel++;
