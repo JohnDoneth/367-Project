@@ -153,9 +153,6 @@ export default class Game {
 
   private playCollisionSound() {
     console.log("collide")
-    AudioManager
-        .getAudio(2)
-        .stop()
 
     AudioManager
         .getAudio(2)
