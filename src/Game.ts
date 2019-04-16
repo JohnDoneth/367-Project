@@ -25,8 +25,13 @@ var currentLevel;
 var currentTime;
 var currentScore;
 
+var usedHint = false;
+
 const stats = require("stats.js")();
 const OIMO = require("oimo");
+
+const hintButton = document.getElementById("timer-screen").getElementsByTagName("button")[0]
+
 
 export default class Game {
   /* Elements for the scene */
@@ -48,9 +53,37 @@ export default class Game {
   /* Player movement */
   private _keys : any;
 
-  constructor() {
+  private _nightMode : boolean;
+
+  constructor(nightMode: boolean) {
     this._keys = listen(window);
 
+    this._nightMode = nightMode;
+    usedHint = false;
+    console.log("Used hint false");
+    hintButton.addEventListener("click", () => {
+      var hintTime = 0;
+      var hinttimer = setInterval(() => {
+        usedHint = true;
+        console.log("Used hint true");
+
+        this
+        ._scene
+        .add(this._ambientLight);
+        this._camera.position.y = 75.0;
+
+        hintTime++;
+        if (hintTime > 3 && usedHint){
+          this
+        ._scene
+        .remove(this._ambientLight);
+        this._camera.position.y = 45.0;
+
+        hintButton.style.display = "none";
+        clearInterval(hinttimer);
+        }
+      }, 1000)
+    });
     currentTime = 0;
     currentScore = 0;
     currentLevel = 1;
@@ -146,10 +179,12 @@ export default class Game {
     ._scene
     .add(this._camera);
 
-  this._ambientLight = new AmbientLight(0x707070, 2.50); // soft white light
-  this
-    ._scene
-    .add(this._ambientLight);
+  if (this._nightMode)
+    this._ambientLight = new AmbientLight(0x707070, 0.5); // soft white light
+  else{
+    this._ambientLight = new AmbientLight(0x707070, 2.5); // soft white light
+    this._scene.add(this._ambientLight);
+  }
 
   this._pointLight = new PointLight(0xffffff, 0.3, 100)
   this._pointLight.castShadow = true;
@@ -274,7 +309,7 @@ export default class Game {
       }
 
       this._camera.position.z = -20.0;
-      this._camera.position.y = 60.0;
+      this._camera.position.y = 45.0;
 
     }
   }
@@ -378,18 +413,21 @@ export default class Game {
       AudioManager
         .getAudio(1)
         .play();
-
       currentScore += currentTime;
       document.getElementById("score").innerHTML = "Score: " + currentScore;
       if (currentLevel == 10){
         window.alert("You win! Score: " + currentScore);
         window.location.reload();
       }
+      if (this._nightMode)
+        hintButton.style.display = "block";
+      usedHint = false;
       currentLevel++;
       currentTime = 0;
       this.initScene();
       this.createPlayer();
       this.initPhysics();
+
     }
 
     this
