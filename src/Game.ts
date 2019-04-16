@@ -70,11 +70,15 @@ export default class Game {
         this
         ._scene
         .add(this._ambientLight);
+        this._camera.position.y = 75.0;
+
         hintTime++;
         if (hintTime > 3 && usedHint){
           this
         ._scene
         .remove(this._ambientLight);
+        this._camera.position.y = 45.0;
+
         hintButton.style.display = "none";
         clearInterval(hinttimer);
         }
