@@ -14,7 +14,7 @@ import {
 import AudioManager from "./AudioManager";
 import MazeCreator, {IMazeResults} from "./MazeCreator";
 import listen from "key-state";
-import {MAZE_ONE} from "./models/Maze";
+import Maze from "./models/Maze";
 
 
 var xAxisOrientation;
@@ -23,6 +23,7 @@ var zAxisOrientation;
 
 var currentLevel;
 var currentTime;
+var currentScore;
 
 const stats = require("stats.js")();
 const OIMO = require("oimo");
@@ -51,6 +52,7 @@ export default class Game {
     this._keys = listen(window);
 
     currentTime = 0;
+    currentScore = 0;
     currentLevel = 1;
     screen.orientation.lock("portrait");
 
@@ -88,6 +90,11 @@ export default class Game {
       .bind(this);
 
     this.initCanvas();
+
+    this.timer = setInterval(() => {
+      document.getElementById("timer").innerHTML = this.formatTime(currentTime);
+      currentTime++;
+    }, 1000)
   }
   
   private handleOrientation(event){ 
@@ -102,7 +109,6 @@ export default class Game {
   private initCanvas() {
     console.log("Initializing canvas...");
     stats.showPanel(0);
-    this._scene = new Scene();
     this._renderer = new WebGLRenderer({antialias: true});
     this
       ._renderer
@@ -115,20 +121,8 @@ export default class Game {
     this
       ._camera
       .rotateX(-(Math.PI / 2));
-    this
-      ._scene
-      .add(this._camera);
 
-    this._ambientLight = new AmbientLight(0x707070, 2.50); // soft white light
-    this
-      ._scene
-      .add(this._ambientLight);
-
-    this._pointLight = new PointLight(0xffffff, 0.3, 100)
-    this._pointLight.castShadow = true;
-    this
-      ._scene
-      .add(this._pointLight);
+    this.initScene();
 
     document
       .body
@@ -143,6 +137,25 @@ export default class Game {
     this.initPhysics();
 	
     this.render();
+  }
+
+  private initScene(){
+    this._scene = new Scene();
+
+    this
+    ._scene
+    .add(this._camera);
+
+  this._ambientLight = new AmbientLight(0x707070, 2.50); // soft white light
+  this
+    ._scene
+    .add(this._ambientLight);
+
+  this._pointLight = new PointLight(0xffffff, 0.3, 100)
+  this._pointLight.castShadow = true;
+  this
+    ._scene
+    .add(this._pointLight);
   }
  
 
@@ -182,14 +195,15 @@ export default class Game {
   private initLevel() {
 
     this._bodies = [];
-    const results : IMazeResults = MazeCreator.create(MAZE_ONE);
+    var maze = new Maze(11, 11, 5, 5);
+    const results : IMazeResults = MazeCreator.create(maze);
     const material = new MeshPhongMaterial({color: 0x1F85DE, specular: 0xffffff, reflectivity: 0.8, shininess: 1.0});
-    const length = MAZE_ONE.cellHeight;
-    const width = MAZE_ONE.cellWidth;
+    const length = maze.cellHeight;
+    const width = maze.cellWidth;
 
     document.getElementById("levelNum").innerHTML = "" + currentLevel;
     /* Generate Maze Floor */
-    const floorGeometry = new BoxGeometry(width * MAZE_ONE.width, 0.25, length * MAZE_ONE.height);
+    const floorGeometry = new BoxGeometry(width * maze.width, 0.25, length * maze.height);
     const floorMesh = new Mesh(floorGeometry, material);
     floorMesh.receiveShadow = true;
     this
@@ -204,12 +218,12 @@ export default class Game {
           .add({
             type: 'box', // type of shape : sphere, box, cylinder
             size: [
-              width * MAZE_ONE.width,
+              width * maze.width,
               0.25,
-              length * MAZE_ONE.height
+              length * maze.height
             ], // size of shape
             pos: [
-              0, -3, -(length * MAZE_ONE.height / 2) + (length / 2)
+              0, -3, -(length * maze.height / 2) + (length / 2)
             ], // start position in degree
             rot: [
               0, 0, 0
@@ -279,11 +293,6 @@ export default class Game {
     this
       ._scene
       .add(this._player);
-
-    this.timer = setInterval(() => {
-        document.getElementById("timer").innerHTML = this.formatTime(currentTime);
-        currentTime++;
-      }, 1000)
   }
 
   private formatTime(val: number){
@@ -370,9 +379,17 @@ export default class Game {
         .getAudio(1)
         .play();
 
+      currentScore += currentTime;
+      document.getElementById("score").innerHTML = "Score: " + currentScore;
+      if (currentLevel == 10){
+        window.alert("You win! Score: " + currentScore);
+        window.location.reload();
+      }
       currentLevel++;
       currentTime = 0;
-      this.initLevel();
+      this.initScene();
+      this.createPlayer();
+      this.initPhysics();
     }
 
     this

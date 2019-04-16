@@ -102,6 +102,7 @@ export default class Maze {
   }
 
   private createExit(exitCell: Cell) {
+    console.log("Creating exit");
     const cellWalls: number[] = [];
     if (exitCell.hasTopWall) {
       cellWalls.push(0);
@@ -116,6 +117,7 @@ export default class Maze {
       cellWalls.push(3);
     }
     const cellWall = Math.floor(Math.random() * cellWalls.length);
+    console.log("Exit cell at " + cellWall);
     const exitWall = cellWalls[cellWall];
     switch (exitWall) {
       case 0:
@@ -162,5 +164,3 @@ export default class Maze {
     return this._cells;
   }
 }
-
-export const MAZE_ONE = new Maze(11, 11, 5, 5);
