@@ -126,8 +126,6 @@ export default class Game {
     });
 
     AudioManager.load("./media/thunk.mp3", (buffer : any) => {
-      
-      console.log(buffer)
       AudioManager
         .getAudio(2)
         .setBuffer(buffer);
@@ -152,8 +150,6 @@ export default class Game {
   }
 
   private playCollisionSound() {
-    console.log("collide")
-
     AudioManager
         .getAudio(2)
         .play()
