@@ -57,6 +57,7 @@ export default class Game {
   private _keys : any;
 
   private _nightMode : boolean;
+  private _ballTrail : boolean;
 
   /* Post Processing */
   private _composer: EffectComposer;
@@ -64,9 +65,11 @@ export default class Game {
   private _hitWallFlag: boolean = false;
 
 
-  constructor(nightMode: boolean) {
+  constructor(nightMode: boolean, ballTrail: boolean) {
 
     this._keys = listen(window);
+
+    this._ballTrail = ballTrail;
 
     this._nightMode = nightMode;
     usedHint = false;
@@ -218,6 +221,7 @@ export default class Game {
     ._scene
     .add(this._pointLight);
 
+    if (this._ballTrail){
         /* Effects */
     const renderPass = new RenderPass(this._scene, this._camera);
     renderPass.renderToScreen = false;
@@ -247,6 +251,7 @@ export default class Game {
       this._ballShadows.push(mesh);
       this._scene.add(mesh)
     }
+  }
 
   }
  
@@ -412,11 +417,15 @@ export default class Game {
 
     const deltaTime = clock.getDelta();
     
-    /*this
+    if (this._ballTrail){
+      this._composer.render(deltaTime);
+    }
+    else{
+      this
       ._renderer
-      .render(this._scene, this._camera);*/
+      .render(this._scene, this._camera);
+    }
 
-    this._composer.render(deltaTime);
 
     stats.update();
 
@@ -425,6 +434,7 @@ export default class Game {
       this.copyPhysicsProperties(body[0], body[1]);
     }
 
+    if (this._ballTrail){
     if (this._world.checkContact('player', 'wall') && this._hitWallFlag == false) {
       this._hitWallFlag = true;
       this.playCollisionSound();
@@ -466,6 +476,7 @@ export default class Game {
         element.visible = false;
       }
     });
+  }
 
     const PLAYER_IMPULSE = 1.0;
    
