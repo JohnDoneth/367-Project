@@ -1,5 +1,6 @@
 /* These do NOT have Typescript implementations, so we must resolve to module names. */
 import {
+  AudioLoader,
   Clock,
   AmbientLight,
   BoxGeometry,
@@ -60,6 +61,8 @@ export default class Game {
   /* Post Processing */
   private _composer: EffectComposer;
   private _ballShadows: any[]
+  private _hitWallFlag: boolean = false;
+
 
   constructor(nightMode: boolean) {
 
@@ -122,6 +125,17 @@ export default class Game {
         .setVolume(0.2);
     });
 
+    AudioManager.load("./media/thunk.mp3", (buffer : any) => {
+      
+      console.log(buffer)
+      AudioManager
+        .getAudio(2)
+        .setBuffer(buffer);
+      AudioManager
+        .getAudio(2)
+        .setVolume(1.5);
+    });
+
     this.render = this
       .render
       .bind(this);
@@ -135,6 +149,17 @@ export default class Game {
       document.getElementById("timer").innerHTML = "Time: " + this.formatTime(currentTime);
       currentTime++;
     }, 1000)
+  }
+
+  private playCollisionSound() {
+    console.log("collide")
+    AudioManager
+        .getAudio(2)
+        .stop()
+
+    AudioManager
+        .getAudio(2)
+        .play()
   }
   
   private handleOrientation(event){ 
@@ -249,6 +274,7 @@ export default class Game {
     this._playerBody = this
       ._world
       .add({
+        name: 'player',
         type: 'sphere', // type of shape : sphere, box, cylinder
         size: [
           1, 1, 1
@@ -331,6 +357,7 @@ export default class Game {
             this
               ._world
               .add({
+                name: 'wall',
                 type: 'box', // type of shape : sphere, box, cylinder
                 size: [
                   wall[0].x, wall[0].y * length,
@@ -406,6 +433,14 @@ export default class Game {
     this.copyPhysicsProperties(this._player, this._playerBody);
     for (const body of this._bodies) {
       this.copyPhysicsProperties(body[0], body[1]);
+    }
+
+    if (this._world.checkContact('player', 'wall') && this._hitWallFlag == false) {
+      this._hitWallFlag = true;
+      this.playCollisionSound();
+    }
+    if (this._world.checkContact('player', 'wall') == false) {
+      this._hitWallFlag = false;
     }
 
     // Spawn a new shadow every 0.1 ms
