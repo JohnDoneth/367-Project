@@ -16,6 +16,7 @@ export default class Maze {
 
     this.createCells();
     this.randomize(this._cells[Math.ceil(this._width / 2) - 1]);
+    this.createExit(this._cells[this._cells.length - 1]);
   }
 
   private createCells() {
@@ -47,7 +48,6 @@ export default class Maze {
         running = false;
       }
     }
-    this.createExit(this._cells[this._cells.length - 1]);
   }
 
   private getNextNeighbor(cell: Cell): Cell | number {
@@ -102,7 +102,6 @@ export default class Maze {
   }
 
   private createExit(exitCell: Cell) {
-    console.log("Creating exit");
     const cellWalls: number[] = [];
     if (exitCell.hasTopWall) {
       cellWalls.push(0);
@@ -117,8 +116,7 @@ export default class Maze {
       cellWalls.push(3);
     }
     const cellWall = Math.floor(Math.random() * cellWalls.length);
-    console.log("Exit cell at " + cellWall);
-    const exitWall = cellWalls[cellWall];
+    const exitWall = cellWalls[cellWall] || 0;
     switch (exitWall) {
       case 0:
         exitCell.hasTopWall = false;
