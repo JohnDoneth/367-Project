@@ -288,7 +288,7 @@ export default class Game {
   private initLevel() {
 
     this._bodies = [];
-    var maze = new Maze(5, 5, 5, 5);
+    var maze = new Maze(13, 13, 5, 5);
     const results : IMazeResults = MazeCreator.create(maze);
     const material = new MeshPhongMaterial({color: 0x1F85DE, specular: 0xffffff, reflectivity: 0.8, shininess: 1.0});
     const length = maze.cellHeight;
