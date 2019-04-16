@@ -1,5 +1,6 @@
 /* These do NOT have Typescript implementations, so we must resolve to module names. */
 import {
+  Clock,
   AmbientLight,
   BoxGeometry,
   Mesh,
@@ -9,13 +10,14 @@ import {
   Scene,
   SphereBufferGeometry,
   WebGLRenderer,
-  PointLight
+  PointLight,
+  Object3D
 } from "three";
 import AudioManager from "./AudioManager";
 import MazeCreator, {IMazeResults} from "./MazeCreator";
 import listen from "key-state";
 import Maze from "./models/Maze";
-
+import { BlendFunction, BloomEffect, KernelSize, NormalPass, SSAOEffect, OutlineEffect, BokehEffect, VignetteEffect, EffectComposer, EffectPass, RenderPass } from "postprocessing";
 
 var xAxisOrientation;
 var yAxisOrientation;
@@ -31,7 +33,7 @@ const stats = require("stats.js")();
 const OIMO = require("oimo");
 
 const hintButton = document.getElementById("timer-screen").getElementsByTagName("button")[0]
-
+const clock = new Clock();
 
 export default class Game {
   /* Elements for the scene */
@@ -55,7 +57,12 @@ export default class Game {
 
   private _nightMode : boolean;
 
+  /* Post Processing */
+  private _composer: EffectComposer;
+  private _ballShadows: any[]
+
   constructor(nightMode: boolean) {
+
     this._keys = listen(window);
 
     this._nightMode = nightMode;
@@ -87,7 +94,7 @@ export default class Game {
     currentTime = 0;
     currentScore = 0;
     currentLevel = 1;
-    screen.orientation.lock("portrait");
+    //screen.orientation.lock("portrait");
 
     window.addEventListener("deviceorientation", this.handleOrientation, true);
 
@@ -146,6 +153,7 @@ export default class Game {
     this
       ._renderer
       .setSize(window.innerWidth, window.innerHeight);
+    this._renderer.setClearColor('#555') 
     this._renderer.shadowMap.enabled = true;
     this._renderer.shadowMap.type = PCFSoftShadowMap; // default
 
@@ -165,6 +173,40 @@ export default class Game {
       .appendChild(this._renderer.domElement);
 
     window.addEventListener('resize', this.onWindowResize, false);
+
+    /* Effects */
+
+    const renderPass = new RenderPass(this._scene, this._camera);
+    renderPass.renderToScreen = false;
+
+    const bloomPass = new EffectPass(this._camera, new BloomEffect({
+      distinction: 0.1,
+      kernelSize: KernelSize.LARGE,
+      blendFunction: BlendFunction.SOFT_LIGHT,
+    }));
+    bloomPass.renderToScreen = true;
+
+    this._composer = new EffectComposer(this._renderer);
+    this._composer.addPass(renderPass);
+    this._composer.addPass(bloomPass);
+    //this._composer.addPass(normalPass);
+    //this._composer.addPass(effectPass);
+
+    /* Init level */
+
+    this._ballShadows = []
+
+    for (let index = 0; index < 20; index++) {
+      let material = new MeshPhongMaterial({color: 0xf0f0f0, specular: 0xffffff, reflectivity: 0.8, shininess: 1.0});
+      let geometry = new SphereBufferGeometry(1.0, 16, 4);
+
+      let mesh: any = new Mesh(geometry, material);
+      mesh.isAlive = false;
+
+      this._ballShadows.push(mesh);
+      this._scene.add(mesh)
+    }
+
 
     this.createPlayer();
     this.initPhysics();
@@ -347,10 +389,18 @@ export default class Game {
       .copy(body.getQuaternion());
   }
 
+  private timeToSpawn = 0;
+
   private render() {
-    this
+
+    const deltaTime = clock.getDelta();
+    
+    /*this
       ._renderer
-      .render(this._scene, this._camera);
+      .render(this._scene, this._camera);*/
+
+    this._composer.render(deltaTime);
+
     stats.update();
 
     this.copyPhysicsProperties(this._player, this._playerBody);
@@ -358,9 +408,42 @@ export default class Game {
       this.copyPhysicsProperties(body[0], body[1]);
     }
 
+    // Spawn a new shadow every 0.1 ms
+    this.timeToSpawn += deltaTime;
+    if (this.timeToSpawn > 0.1) {
+      this.timeToSpawn = 0;
+
+      for (let element of this._ballShadows) {
+        if (!element.isAlive) {
+          element.isAlive = true;
+          element.scale.setScalar(1.0);
+          element.timeAlive = 0.0;
+          element.material.opacity = 1.0;
+          element.position.set(this._player.position.x, this._player.position.y, this._player.position.z);
+          break;
+        }
+      }
+    }
+    
+    // Apply effects to each alive shadow
+    this._ballShadows.forEach(element => {
+      if (element.isAlive) {
+        element.visible = true;
+        element.material.transparent = true;
+        element.material.opacity -= deltaTime
+        element.scale.subScalar(deltaTime);
+        element.timeAlive += deltaTime;
+
+        if (element.timeAlive > 1.0) {
+          element.isAlive = false;
+        }
+      } else {
+        element.visible = false;
+      }
+    });
+
     const PLAYER_IMPULSE = 1.0;
    
-
     if (this._keys["ArrowUp"]) {
       this
         ._playerBody
