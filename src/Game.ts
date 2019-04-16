@@ -60,7 +60,7 @@ export default class Game {
 
   /* Post Processing */
   private _composer: EffectComposer;
-  private _ballShadows: any[]
+  private _ballShadows: any[];
   private _hitWallFlag: boolean = false;
 
 
@@ -212,7 +212,7 @@ export default class Game {
     this._scene.add(this._ambientLight);
   }
 
-  this._pointLight = new PointLight(0xffffff, 0.3, 100)
+  this._pointLight = new PointLight(0xffffff, 0.3, 100);
   this._pointLight.castShadow = true;
   this
     ._scene
@@ -288,7 +288,7 @@ export default class Game {
   private initLevel() {
 
     this._bodies = [];
-    var maze = new Maze(11, 11, 5, 5);
+    var maze = new Maze(5, 5, 5, 5);
     const results : IMazeResults = MazeCreator.create(maze);
     const material = new MeshPhongMaterial({color: 0x1F85DE, specular: 0xffffff, reflectivity: 0.8, shininess: 1.0});
     const length = maze.cellHeight;

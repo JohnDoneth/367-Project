@@ -111,20 +111,21 @@ export default class Maze {
     const exitCellIndex: number = Math.floor(Math.random() * cornerCells.length);
     const exitCell: Cell = cornerCells[exitCellIndex] || cornerCells[3];
     const cellWalls: number[] = [];
-    if (exitCell.hasTopWall) {
+    if (exitCell.hasTopWall && (exitCellIndex === 2 || exitCellIndex === 3)) {
       cellWalls.push(0);
     }
-    if (exitCell.hasRightWall) {
+    if (exitCell.hasRightWall && (exitCellIndex === 0 || exitCellIndex === 2)) {
       cellWalls.push(1);
     }
-    if (exitCell.hasBotWall) {
+    if (exitCell.hasBotWall && (exitCellIndex === 0 || exitCellIndex === 1)) {
       cellWalls.push(2);
     }
-    if (exitCell.hasLeftWall) {
+    if (exitCell.hasLeftWall && (exitCellIndex === 1 || exitCellIndex === 3)) {
       cellWalls.push(3);
     }
     const cellWall = Math.floor(Math.random() * cellWalls.length);
     const exitWall = cellWalls[cellWall] || 0;
+    console.log(exitWall, cellWall, cellWalls);
     switch (exitWall) {
       case 0:
         exitCell.hasTopWall = false;
@@ -141,6 +142,7 @@ export default class Maze {
       default:
         exitCell.hasTopWall = false;
     }
+    console.log(exitCellIndex, exitCell);
   }
 
   private getIndex(col: number, row: number) {
