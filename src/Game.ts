@@ -118,7 +118,7 @@ export default class Game {
     this.initCanvas();
 
     this.timer = setInterval(() => {
-      document.getElementById("timer").innerHTML = this.formatTime(currentTime);
+      document.getElementById("timer").innerHTML = "Time: " + this.formatTime(currentTime);
       currentTime++;
     }, 1000)
   }
@@ -224,7 +224,7 @@ export default class Game {
     const length = maze.cellHeight;
     const width = maze.cellWidth;
 
-    document.getElementById("levelNum").innerHTML = "" + currentLevel;
+    document.getElementById("level").innerHTML = "Level: " + currentLevel;
     /* Generate Maze Floor */
     const floorGeometry = new BoxGeometry(width * maze.width, 0.25, length * maze.height);
     const floorMesh = new Mesh(floorGeometry, material);
