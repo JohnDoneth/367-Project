@@ -15,6 +15,7 @@ class AudioManager {
 
   private _bgMusic: Audio;
   private _deathSound: Audio;
+  private _thunkSound: Audio;
 
   private constructor() {
     this._listener = new AudioListener();
@@ -22,6 +23,7 @@ class AudioManager {
 
     this._bgMusic = new Audio(this._listener);
     this._deathSound = new Audio(this._listener);
+    this._thunkSound = new Audio(this._listener);
   }
 
   public load(url: string, onLoad: Function, onProgress?: Function, onError?: Function) {
@@ -34,6 +36,8 @@ class AudioManager {
         return this._bgMusic;
       case 1:
         return this._deathSound;
+      case 2:
+        return this._thunkSound;
       default:
         return new Audio(this._listener);
     }

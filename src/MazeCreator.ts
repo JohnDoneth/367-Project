@@ -62,6 +62,7 @@ class MazeCreator {
           ]);
         }
         objects.push({position: new OIMO.Vec3(Math.ceil(maze.width / 2) - (j + 1), 1, i), walls, cell});
+
         count++
       }
     }
