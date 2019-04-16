@@ -10,7 +10,8 @@ import {
   Scene,
   SphereBufferGeometry,
   WebGLRenderer,
-  PointLight
+  PointLight,
+  Object3D
 } from "three";
 import AudioManager from "./AudioManager";
 import MazeCreator, {IMazeResults} from "./MazeCreator";
@@ -52,6 +53,7 @@ export default class Game {
 
   /* Post Processing */
   private _composer: EffectComposer;
+  private _ballShadows: any[]
 
   constructor() {
     this._keys = listen(window);
@@ -165,6 +167,20 @@ export default class Game {
     //this._composer.addPass(effectPass);
 
     /* Init level */
+
+    this._ballShadows = []
+
+    for (let index = 0; index < 20; index++) {
+      let material = new MeshPhongMaterial({color: 0xf0f0f0, specular: 0xffffff, reflectivity: 0.8, shininess: 1.0});
+      let geometry = new SphereBufferGeometry(1.0, 16, 4);
+
+      let mesh: any = new Mesh(geometry, material);
+      mesh.isAlive = false;
+
+      this._ballShadows.push(mesh);
+      this._scene.add(mesh)
+    }
+
 
     this.createPlayer();
     this.initPhysics();
@@ -330,13 +346,17 @@ export default class Game {
       .copy(body.getQuaternion());
   }
 
+  private timeToSpawn = 0;
+
   private render() {
+
+    const deltaTime = clock.getDelta();
     
     /*this
       ._renderer
       .render(this._scene, this._camera);*/
 
-    this._composer.render(clock.getDelta());
+    this._composer.render(deltaTime);
 
     stats.update();
 
@@ -345,9 +365,42 @@ export default class Game {
       this.copyPhysicsProperties(body[0], body[1]);
     }
 
+    // Spawn a new shadow every 0.1 ms
+    this.timeToSpawn += deltaTime;
+    if (this.timeToSpawn > 0.1) {
+      this.timeToSpawn = 0;
+
+      for (let element of this._ballShadows) {
+        if (!element.isAlive) {
+          element.isAlive = true;
+          element.scale.setScalar(1.0);
+          element.timeAlive = 0.0;
+          element.material.opacity = 1.0;
+          element.position.set(this._player.position.x, this._player.position.y, this._player.position.z);
+          break;
+        }
+      }
+    }
+    
+    // Apply effects to each alive shadow
+    this._ballShadows.forEach(element => {
+      if (element.isAlive) {
+        element.visible = true;
+        element.material.transparent = true;
+        element.material.opacity -= deltaTime
+        element.scale.subScalar(deltaTime);
+        element.timeAlive += deltaTime;
+
+        if (element.timeAlive > 1.0) {
+          element.isAlive = false;
+        }
+      } else {
+        element.visible = false;
+      }
+    });
+
     const PLAYER_IMPULSE = 1.0;
    
-
     if (this._keys["ArrowUp"]) {
       this
         ._playerBody
