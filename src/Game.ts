@@ -53,9 +53,12 @@ export default class Game {
   /* Player movement */
   private _keys : any;
 
-  constructor() {
+  private _nightMode : boolean;
+
+  constructor(nightMode: boolean) {
     this._keys = listen(window);
 
+    this._nightMode = nightMode;
     usedHint = false;
     console.log("Used hint false");
     hintButton.addEventListener("click", () => {
@@ -172,7 +175,12 @@ export default class Game {
     ._scene
     .add(this._camera);
 
-  this._ambientLight = new AmbientLight(0x707070, 0.5); // soft white light
+  if (this._nightMode)
+    this._ambientLight = new AmbientLight(0x707070, 0.5); // soft white light
+  else{
+    this._ambientLight = new AmbientLight(0x707070, 2.5); // soft white light
+    this._scene.add(this._ambientLight);
+  }
 
   this._pointLight = new PointLight(0xffffff, 0.3, 100)
   this._pointLight.castShadow = true;
@@ -297,7 +305,7 @@ export default class Game {
       }
 
       this._camera.position.z = -20.0;
-      this._camera.position.y = 30.0;
+      this._camera.position.y = 45.0;
 
     }
   }
@@ -407,7 +415,8 @@ export default class Game {
         window.alert("You win! Score: " + currentScore);
         window.location.reload();
       }
-      hintButton.style.display = "block";
+      if (this._nightMode)
+        hintButton.style.display = "block";
       usedHint = false;
       currentLevel++;
       currentTime = 0;
