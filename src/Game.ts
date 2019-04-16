@@ -171,7 +171,7 @@ export default class Game {
     this
       ._renderer
       .setSize(window.innerWidth, window.innerHeight);
-    this._renderer.setClearColor('#555') 
+    this._renderer.setClearColor('#555');
     this._renderer.shadowMap.enabled = true;
     this._renderer.shadowMap.type = PCFSoftShadowMap; // default
 

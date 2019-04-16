@@ -16,7 +16,7 @@ export default class Maze {
 
     this.createCells();
     this.randomize(this._cells[Math.ceil(this._width / 2) - 1]);
-    this.createExit(this._cells[this._cells.length - 1]);
+    this.createExit();
   }
 
   private createCells() {
@@ -101,7 +101,15 @@ export default class Maze {
     }
   }
 
-  private createExit(exitCell: Cell) {
+  private createExit() {
+    const cornerCells: Cell[] = [];
+    cornerCells.push(this._cells[0]); // Bottom right cell
+    cornerCells.push(this._cells[this._width - 1]); // Bottom left cell
+    cornerCells.push(this._cells[(this._width * this._height) - this._height]); // Top right cell
+    cornerCells.push(this._cells[this._cells.length - 1]);
+
+    const exitCellIndex: number = Math.floor(Math.random() * cornerCells.length);
+    const exitCell: Cell = cornerCells[exitCellIndex] || cornerCells[3];
     const cellWalls: number[] = [];
     if (exitCell.hasTopWall) {
       cellWalls.push(0);
